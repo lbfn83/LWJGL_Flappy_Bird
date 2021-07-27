@@ -1,11 +1,14 @@
 package com.wonzii.flappy.level;
 
 import com.wonzii.flappy.graphics.Shader;
+import com.wonzii.flappy.graphics.Texture;
 import com.wonzii.flappy.graphics.VertexArray;
 
 public class Level {
 
 	private VertexArray background;
+	private Texture bgTexture;
+	
 	
 	public Level() {
 		float[] vertices = new float[] {
@@ -22,18 +25,21 @@ public class Level {
 		
 		float[] tcs = new float[] {
 				0f ,1f ,
-				0f ,0f ,
+				0f ,0f , 
 				1f ,0f ,
 				1f ,1f
 		};
 		
 		background = new VertexArray(vertices, indices, tcs);
+		bgTexture = new Texture("res/bg.jpeg");
 		
 	}
 	
 	public void render() {
+		bgTexture.bind();
 		Shader.BG.enable();
 		background.render();
 		Shader.BG.disable();
+		bgTexture.unbind();
 	}
 }

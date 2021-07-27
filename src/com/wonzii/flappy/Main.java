@@ -3,6 +3,7 @@ package com.wonzii.flappy;
 
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL13.*;
 import static org.lwjgl.system.MemoryUtil.*;
 
 import org.lwjgl.glfw.GLFWVidMode;
@@ -63,14 +64,17 @@ public class Main implements Runnable {
 		// * Enables the specified OpenGL state.
 		glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
 		glEnable(GL_DEPTH_TEST);
+		glActiveTexture(GL_TEXTURE1);
+		
 		System.out.println("OpenGL: " + glGetString(GL_VERSION));
 		
 		Shader.loadAll();
 		
 	
-		Matrix4f pr_matrix = Matrix4f.orthographic(-10f, 10f, 10f * 9f / 16f, -10f * 9f / 16f, -1.0f, 1.0f); 
+		Matrix4f pr_matrix = Matrix4f.orthographic(-10f, 10f, -10f * 9f / 16f, 10f * 9f / 16f, -1.0f, 1.0f); 
 		Shader.BG.setUniform4f("pr_matrix", pr_matrix);
-
+		Shader.BG.setUniform1i("tex", 1);
+		
 		level = new Level();
 	}
 	// from runnable interface / invoked by thread start()
