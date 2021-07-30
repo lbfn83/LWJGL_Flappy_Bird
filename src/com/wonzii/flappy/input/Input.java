@@ -3,21 +3,31 @@ package com.wonzii.flappy.input;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWKeyCallback;
 
-//This will be tied to glfwSetKeyCallback
+//https://www.glfw.org/docs/latest/input_guide.html#input_key
 public class Input extends GLFWKeyCallback{
-
-	// int 대신에 boolean을 사용하는 이유는 ?
-	// static인 이유는 instance로 만들지 않아도 이 변수에 접근이 가능해야 하기 때문
+	
+	// All the key bindings are defined in GLFW.class
+	
 	public static boolean[] keys = new boolean[65536]; 
-	// key corresponds with key bindings defined in GLFW.class
-	// action : the key action. One of:<br><table><tr><td>{@link GLFW#GLFW_PRESS PRESS}</td><td>{@link GLFW#GLFW_RELEASE RELEASE}</td><td>{@link GLFW#GLFW_REPEAT REPEAT}</td></tr></table>
+	/*
+	 * action : 
+		#define GLFW_RELEASE   0
+		The key or mouse button was released.
+	
+		#define GLFW_PRESS   1
+		The key or mouse button was pressed.
+	
+		#define GLFW_REPEAT   2
+		The key was held down until it repeated.
+	*/
+	
+	
 	public void invoke(long window, int key, int scancode, int action, int mods) {
 		
-		// key action has three states : release, press, repeat
-		// the states that can be count as true is... press and repeat... 
-		// so whole logic is other than RELEASE it should be true
+		// press and repeat are counted as true
 		
 		keys[key] = action == GLFW.GLFW_RELEASE ? false:true ;
+		//	System.out.println("Input Class: key => " + key + ", action" + action);
 	
 	}
 

@@ -4,9 +4,8 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
-
+// Helper class : not instaiated
 public class BufferUtils {
-	//private cause we don't want it to be accidentally instantiated
 	private BufferUtils() {
 		
 	}

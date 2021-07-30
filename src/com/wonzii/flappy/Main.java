@@ -55,6 +55,12 @@ public class Main implements Runnable {
 		
 		glfwSetKeyCallback(window, new Input());
 		
+		/*Scan code is different from default key binding since it is platform specific*/
+		int scancode = glfwGetKeyScancode(GLFW_KEY_X);
+		System.out.println("Scancode : " + scancode + ", " + GLFW_KEY_X);
+		
+		
+		
 		// Make the OpenGL context current
 		glfwMakeContextCurrent(window);
 		glfwShowWindow(window);
@@ -115,9 +121,9 @@ public class Main implements Runnable {
 			
 			if(delta >= 1.0)
 			{
+				delta--;
 				update();
 				updates++;
-				delta--;
 			}
 			render();
 			frames++;
@@ -141,12 +147,13 @@ public class Main implements Runnable {
 		glfwPollEvents();
 		level.update();
 		
-		/* Input testing
+		
+		/* Input testing */
 		if(Input.keys[GLFW_KEY_SPACE])
 		{
-			  System.out.println("oh crap");
+			  System.out.println("SPACE key binidng is "+GLFW_KEY_SPACE);
 		}
-		*/
+		
 	}
 	
 	private void render()

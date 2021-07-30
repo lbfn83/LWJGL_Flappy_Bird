@@ -53,7 +53,9 @@ public class Level {
 			map++;
 		}
 	}
-	
+	// since render's cycle is way faster than update. for this game, it is not really necessary to render cycle this fast. 
+	// there must be split seconds where shaders rendering meshes at the same coordination for hundreds of times but it is less than milliseconds job
+	// so eyes can only perceive background flowing smoothly.
 	public void render() {
 		bgTexture.bind();
 		Shader.BG.enable();
