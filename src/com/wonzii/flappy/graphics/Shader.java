@@ -8,6 +8,9 @@ import com.wonzii.flappy.math.Matrix4f;
 import com.wonzii.flappy.math.Vector3f;
 import com.wonzii.flappy.utils.ShaderUtils;
 
+//the singleton pattern : restricts the instantiation of a class to one "single" instance.
+//in this case, restricts it to the number of members ( BG, BIRD, PIPE, FADE )
+
 public class Shader {
 
 	public static final int VERTEX_ATTRIB = 0;
@@ -21,13 +24,12 @@ public class Shader {
 	
 	private Map<String, Integer> locationCache = new HashMap<String, Integer>();
 	
-	public Shader(String vertex, String fragment) {
+	private Shader(String vertex, String fragment) {
 		ID = ShaderUtils.load(vertex, fragment);
 	}
 	
 	public static void loadAll()
 	{
-		// vert와 frag와 링크된 모든 프로그램이 return되겠지. 
 		BG = new Shader("shader/bg.vert", "shader/bg.frag");
 //		BIRD = new Shader("shader/bird.vert", "shader/bird.frag");
 //		PIPE = new Shader("shader/pipe.vert", "shader/pipe.frag");

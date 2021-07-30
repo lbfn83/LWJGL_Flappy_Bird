@@ -23,7 +23,6 @@ public class Main implements Runnable {
 	
 	private boolean running = true;
 	
-	// identifier 
 	private long window;
 	
 	private Level level;
@@ -32,7 +31,7 @@ public class Main implements Runnable {
 		thread = new Thread(this, "Game");
 		thread.start();
 	}
-	// from thread class
+	
 	private void init() {
 		if (glfwInit() == false)
 		{
@@ -49,7 +48,8 @@ public class Main implements Runnable {
 			return;
 		}
 		GLFWVidMode vidmode = glfwGetVideoMode(glfwGetPrimaryMonitor());
-		//when we created the object => This is how set position -> window.setPos()
+		
+		//when we created the window object => using window.setPos() to set position  
 		glfwSetWindowPos(window, (vidmode.width() - width)/2,( vidmode.height()-height) /2);
 		
 		
@@ -58,6 +58,7 @@ public class Main implements Runnable {
 		// Make the OpenGL context current
 		glfwMakeContextCurrent(window);
 		glfwShowWindow(window);
+		
 		//* Creates a new {@link GLCapabilities} instance for the OpenGL context that is current in the current thread.
 		GL.createCapabilities();
 		
@@ -68,24 +69,66 @@ public class Main implements Runnable {
 		
 		System.out.println("OpenGL: " + glGetString(GL_VERSION));
 		
+		//Is it created as an instance? 
+		//the singleton pattern : restricts the instantiation of a class to one "single" instance.
+		//examine Shader class
 		Shader.loadAll();
-		
-	
+
+		//	Projection matrix. since it is used universally among all the Shader instances, defined in Main class
+		// https://lwjglgamedev.gitbooks.io/3d-game-development-with-lwjgl/content/chapter06/chapter6.html
+		//  perspective projection and  orthographic projection
 		Matrix4f pr_matrix = Matrix4f.orthographic(-10f, 10f, -10f * 9f / 16f, 10f * 9f / 16f, -1.0f, 1.0f); 
+		
 		Shader.BG.setUniform4f("pr_matrix", pr_matrix);
+		
+		//The value should be corresponding with the Texture number defined in glActiveTexture
 		Shader.BG.setUniform1i("tex", 1);
 		
 		level = new Level();
 	}
-	// from runnable interface / invoked by thread start()
+	
+//from runnable interface / invoked by thread start()
 	public void run() {
 		
-		// make sure init() can't run on the standard thread. because we have to do everything on this thread
+		//make sure init() can't run on the standard thread. 
+		//because all the parameters derived from level, Shader, and other classes 
+		//defined in this thread
 		init();
+		
+		/* Below codes are to slow down the update cycle*/
+		long lastTime = System.nanoTime();
+		double delta = 0.0;
+		
+		// why divided by 60? to be able to invoke update() 60 times per every second
+		// so UPS will be around 60
+		double ns = 1000000000.0/60 ;
+		long timer = System.currentTimeMillis();
+		int updates = 0;
+		int frames = 0;
+		
+		
 		while(running)
 		{
-			update();
+			long now = System.nanoTime();
+			delta += (now - lastTime) / ns;
+			lastTime = now;
+			
+			if(delta >= 1.0)
+			{
+				update();
+				updates++;
+				delta--;
+			}
 			render();
+			frames++;
+			// to measure UPS and FPS
+			if ( System.currentTimeMillis() - timer > 1000) {
+				timer += 1000;
+				System.out.println(updates + " ups, "+frames + " fps");
+				updates = 0;
+				frames = 0;
+			}
+			
 			
 			if(glfwWindowShouldClose(window) == true )
 			{
@@ -96,15 +139,21 @@ public class Main implements Runnable {
 	private void update()
 	{
 		glfwPollEvents();
+		level.update();
+		
+		/* Input testing
 		if(Input.keys[GLFW_KEY_SPACE])
 		{
-//			  System.out.println("oh crap");
+			  System.out.println("oh crap");
 		}
+		*/
 	}
+	
 	private void render()
 	{
-		//* Sets portions of every pixel in a particular buffer to the same value. The value to which each buffer is cleared depends on the setting of the clear
-	     //* value for that buffer.
+		//* Sets portions of every pixel in a particular buffer to the same value. 
+		//The value to which each buffer is cleared depends on the setting of the clear
+	    //* value for that buffer.
 		glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 		level.render();
 		
@@ -118,9 +167,7 @@ public class Main implements Runnable {
 		glfwSwapBuffers(window);
 	}
 	public static void main(String[] args) {
-		// TODO : understand the below statement
-		// new is for instantiation
-		// yet I saw class itself is instantiated but never seen the case instantiate the method
+		// 'new' / instantiate Main class 
 		new Main().start();
 		
 		
