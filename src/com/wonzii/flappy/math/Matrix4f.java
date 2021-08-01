@@ -37,7 +37,7 @@ public class Matrix4f {
 	
 	public static Matrix4f orthographic(float left, float right, float bottom, float top, float near, float far) {
 		Matrix4f result = identity();
-		
+		//https://www.scratchapixel.com/lessons/3d-basic-rendering/perspective-and-orthographic-projection-matrix/orthographic-projection-matrix
 		// column major order 
 		result.elements[ 0 + 0 *4 ] = 2.0f / (right - left);
 		result.elements[ 1 + 1 *4 ] = 2.0f / (top - bottom);
@@ -50,9 +50,9 @@ public class Matrix4f {
 		return result;
 	}
 	
-	
-	// Opengl using column major ordering 
-	// but when it comes to multiplication it doesn't really change much
+	// https://www.scratchapixel.com/lessons/mathematics-physics-for-computer-graphics/geometry/row-major-vs-column-major-vector
+	// Column major ordering matrix multiplication is done in the same way as Row major. 
+	// only difference is the index of each element
 	public Matrix4f multiply(Matrix4f matrix) {
 		Matrix4f result = new Matrix4f();
 		
@@ -62,14 +62,16 @@ public class Matrix4f {
 				
 				for(int e = 0; e < 4; e++)
 				{
-					sum += this.elements[e + x * 4] * matrix.elements[e * 4 + y];
+					sum += this.elements[x + e * 4] * matrix.elements[y * 4 + e];
 				}
-				result.elements[4 * x + y] = sum;	
+				result.elements[ x + 4 * y] = sum;	
 			}
 		}
 		return result;
 	}
+	
 	//move the object 
+	//column major ordering
 	public static Matrix4f translate(Vector3f vector)
 	{
 		Matrix4f result = identity();
@@ -82,7 +84,7 @@ public class Matrix4f {
 		return result;
 	}
 	// Rotation around the Z-axis / https://learnopengl.com/Getting-started/Transformations
-   	
+   	// column major ordering
 	public static Matrix4f rotate(float angle)
 	{
 		Matrix4f result = identity();

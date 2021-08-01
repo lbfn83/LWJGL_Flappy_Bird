@@ -68,12 +68,16 @@ public class Bird {
 		
 		if( Input.isKeyDown(GLFW_KEY_SPACE))
 		{
-			delta -=
-					0.015f ;
+			delta =	-0.15f ;
 		}else
 		{
-			delta +=0.001f;                         
+			delta += 0.01f;                         
 		}
+		// when delta is minus, bird's face up
+		// when delta is plus, bird's face down
+		rot = -delta * 90.0f;
+		if( rot < -13f)
+			rot = -13f;
 	}
 	private void fall()
 	{
@@ -83,7 +87,7 @@ public class Bird {
 	public void render() {
 
 		Shader.BIRD.enable();
-		Shader.BIRD.setUniform4f("ml_matrix", Matrix4f.translate(position));
+		Shader.BIRD.setUniform4f("ml_matrix", Matrix4f.translate(position).multiply(Matrix4f.rotate(rot)));
 		texture.bind();
 		mesh.render();
 

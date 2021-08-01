@@ -68,7 +68,7 @@ public class Level {
 		// http://www.opengl-tutorial.org/beginners-tutorials/tutorial-3-matrices/
 		// View matrix is not the right terminology
 		// Coordination rule :  
-		for(int i = map; i < map + 3 ; i++ )
+		for(int i = map; i < map + 4 ; i++ )
 		{
 			Shader.BG.setUniform4f("ml_matrix", Matrix4f.translate(new Vector3f(i * 10 + xScroll*0.03f, 0.0f, 0.0f)));
 			background.draw();
