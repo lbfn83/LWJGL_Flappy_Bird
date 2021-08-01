@@ -12,6 +12,7 @@ public class Level {
 	private Texture bgTexture;
 	private int xScroll = 0;
 	private int map = 0;
+	private Bird bird;
 	
 	public Level() {
 		float[] vertices = new float[] {
@@ -35,7 +36,7 @@ public class Level {
 		
 		background = new VertexArray(vertices, indices, tcs);
 		bgTexture = new Texture("res/bg.jpeg");
-		
+		bird = new Bird();
 	}
 	
 	public void update() {
@@ -47,11 +48,12 @@ public class Level {
 		// the width of display is 10 so translation matrix vector starts with i*10
 		// every multiple of 335 will increase the count of map 
 		// it is because xScroll won't be reset but still counting down while game is running
-		
-		if (-xScroll%335 == 0)
+		//When map is increased, xscroll*0.03f should be -10 to offset i * 10
+		if (-xScroll%334 == 0)
 		{
 			map++;
 		}
+		bird.update();
 	}
 	// since render's cycle is way faster than update. for this game, it is not really necessary to render cycle this fast. 
 	// there must be split seconds where shaders rendering meshes at the same coordination for hundreds of times but it is less than milliseconds job
@@ -68,12 +70,13 @@ public class Level {
 		// Coordination rule :  
 		for(int i = map; i < map + 3 ; i++ )
 		{
-			Shader.BG.setUniform4f("vw_matrix", Matrix4f.translate(new Vector3f(i * 10 + xScroll*0.03f, 0.0f, 0.0f)));
+			Shader.BG.setUniform4f("ml_matrix", Matrix4f.translate(new Vector3f(i * 10 + xScroll*0.03f, 0.0f, 0.0f)));
 			background.draw();
 		}
 		Shader.BG.disable();
 		bgTexture.unbind();
-			
+		bird.render();
+		
 		
 	}
 }

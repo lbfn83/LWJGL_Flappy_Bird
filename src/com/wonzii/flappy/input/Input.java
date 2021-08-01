@@ -8,7 +8,7 @@ public class Input extends GLFWKeyCallback{
 	
 	// All the key bindings are defined in GLFW.class
 	
-	public static boolean[] keys = new boolean[65536]; 
+	private static boolean[] keys = new boolean[65536]; 
 	/*
 	 * action : 
 		#define GLFW_RELEASE   0

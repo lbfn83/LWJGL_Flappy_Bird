@@ -31,7 +31,7 @@ public class Shader {
 	public static void loadAll()
 	{
 		BG = new Shader("shader/bg.vert", "shader/bg.frag");
-//		BIRD = new Shader("shader/bird.vert", "shader/bird.frag");
+		BIRD = new Shader("shader/bird.vert", "shader/bird.frag");
 //		PIPE = new Shader("shader/pipe.vert", "shader/pipe.frag");
 //		FADE = new Shader("shader/fade.vert", "shader/fade.frag");
 	}

@@ -11,6 +11,7 @@ import org.lwjgl.opengl.GL;
 
 import com.wonzii.flappy.graphics.Shader;
 import com.wonzii.flappy.input.Input;
+import com.wonzii.flappy.level.Bird;
 import com.wonzii.flappy.level.Level;
 import com.wonzii.flappy.math.Matrix4f;
 
@@ -26,6 +27,7 @@ public class Main implements Runnable {
 	private long window;
 	
 	private Level level;
+	private Bird bird;
 	
 	public void start() {
 		thread = new Thread(this, "Game");
@@ -72,7 +74,6 @@ public class Main implements Runnable {
 		glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
 		glEnable(GL_DEPTH_TEST);
 		glActiveTexture(GL_TEXTURE1);
-		
 		System.out.println("OpenGL: " + glGetString(GL_VERSION));
 		
 		//Is it created as an instance? 
@@ -86,11 +87,15 @@ public class Main implements Runnable {
 		Matrix4f pr_matrix = Matrix4f.orthographic(-10f, 10f, -10f * 9f / 16f, 10f * 9f / 16f, -1.0f, 1.0f); 
 		
 		Shader.BG.setUniform4f("pr_matrix", pr_matrix);
-		
 		//The value should be corresponding with the Texture number defined in glActiveTexture
 		Shader.BG.setUniform1i("tex", 1);
 		
+		Shader.BIRD.setUniform4f("pr_matrix", pr_matrix);
+		//The value should be corresponding with the Texture number defined in glActiveTexture
+		Shader.BIRD.setUniform1i("tex", 1);
+		
 		level = new Level();
+		
 	}
 	
 //from runnable interface / invoked by thread start()
@@ -149,9 +154,13 @@ public class Main implements Runnable {
 		
 		
 		/* Input testing */
-		if(Input.keys[GLFW_KEY_SPACE])
+		if(Input.isKeyDown(GLFW_KEY_SPACE))
 		{
 			  System.out.println("SPACE key binidng is "+GLFW_KEY_SPACE);
+		}
+		if(Input.isKeyDown(GLFW_KEY_ESCAPE))
+		{
+			  glfwSetWindowShouldClose(window, true);
 		}
 		
 	}
