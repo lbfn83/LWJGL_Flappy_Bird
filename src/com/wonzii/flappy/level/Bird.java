@@ -21,14 +21,14 @@ public class Bird {
 	
 	public Bird() {
 		
-	float[] vertices = new float[] {
-			-size/2.0f, -size/2.0f, 0.1f,
-			-size/2.0f, size/2.0f , 0.1f,
-			size/2.0f, size/2.0f , 0.1f,
-			size/2.0f, -size/2.0f, 0.1f,
+		float[] vertices = new float[] {
+				-size/2.0f, -size/2.0f, 0.1f,
+				-size/2.0f, size/2.0f , 0.1f,
+				size/2.0f, size/2.0f , 0.1f,
+				size/2.0f, -size/2.0f, 0.1f,
+				
+			};
 			
-		};
-		
 		byte[] indices = new byte[] {
 				0, 1, 2,
 				2, 3, 0
@@ -76,14 +76,9 @@ public class Bird {
 		// when delta is minus, bird's face up
 		// when delta is plus, bird's face down
 		rot = -delta * 90.0f;
-		if( rot < -13f)
-			rot = -13f;
+
 	}
-	private void fall()
-	{
-		delta = -0.15f;
-	}
-	
+
 	public void render() {
 
 		Shader.BIRD.enable();

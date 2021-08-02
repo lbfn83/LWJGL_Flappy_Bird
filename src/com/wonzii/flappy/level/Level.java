@@ -13,6 +13,8 @@ public class Level {
 	private int xScroll = 0;
 	private int map = 0;
 	private Bird bird;
+	private Pipe pipe;
+	
 	
 	public Level() {
 		float[] vertices = new float[] {
@@ -37,6 +39,7 @@ public class Level {
 		background = new VertexArray(vertices, indices, tcs);
 		bgTexture = new Texture("res/bg.jpeg");
 		bird = new Bird();
+		pipe = new Pipe(0f,0f);
 	}
 	
 	public void update() {
@@ -71,12 +74,12 @@ public class Level {
 		for(int i = map; i < map + 4 ; i++ )
 		{
 			Shader.BG.setUniform4f("ml_matrix", Matrix4f.translate(new Vector3f(i * 10 + xScroll*0.03f, 0.0f, 0.0f)));
-			background.draw();
+			//background.draw();
 		}
 		Shader.BG.disable();
 		bgTexture.unbind();
 		bird.render();
-		
+		pipe.render();
 		
 	}
 }

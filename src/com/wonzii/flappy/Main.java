@@ -94,6 +94,10 @@ public class Main implements Runnable {
 		//The value should be corresponding with the Texture number defined in glActiveTexture
 		Shader.BIRD.setUniform1i("tex", 1);
 		
+		Shader.PIPE.setUniform4f("pr_matrix", pr_matrix);
+		//The value should be corresponding with the Texture number defined in glActiveTexture
+		Shader.PIPE.setUniform1i("tex", 1);
+		
 		level = new Level();
 		
 	}

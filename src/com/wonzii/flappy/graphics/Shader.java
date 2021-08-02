@@ -32,7 +32,7 @@ public class Shader {
 	{
 		BG = new Shader("shader/bg.vert", "shader/bg.frag");
 		BIRD = new Shader("shader/bird.vert", "shader/bird.frag");
-//		PIPE = new Shader("shader/pipe.vert", "shader/pipe.frag");
+		PIPE = new Shader("shader/pipe.vert", "shader/pipe.frag");
 //		FADE = new Shader("shader/fade.vert", "shader/fade.frag");
 	}
 	//Uniform 변수의 location을 알려주는 거다. uniform 변수의 값 자체는 get할 이유는 없다.. set 만 있을 뿐
