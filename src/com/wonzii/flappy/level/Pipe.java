@@ -8,23 +8,15 @@ import com.wonzii.flappy.math.Vector3f;
 
 public class Pipe {
 	
-	private float width = 5f, height = 20f;
+	private static float width = 1.5f, height = 5f;
 	
 	private Vector3f position = new Vector3f();
-	private Texture texture;
-	private VertexArray mesh;
+	private static Texture texture;
+	private static VertexArray mesh;
 	
 	
-//	public static create()
-//	{
-//		
-//	}
-	
-	public Pipe(float x, float y)
+	public static void createPipes()
 	{
-		position.x = x;
-		position.y = y;
-		
 		float[] vertices = new float[] {
 				0, 0, 0.1f,
 				0, height , 0.1f,
@@ -47,7 +39,13 @@ public class Pipe {
 		
 		mesh = new VertexArray(vertices, indices, tcs);
 		texture = new Texture("res/pipe.png");
-		
+	}
+	
+	public Pipe(float x, float y)
+	{
+		position.x = x;
+		position.y = y;
+	
 	}
 	public void render() {
 
