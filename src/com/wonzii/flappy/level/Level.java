@@ -51,6 +51,11 @@ public class Level {
 		
 	}
 	
+	public void updatePipes() 
+	{
+		
+	}
+	
 	public void update() {
 		//the degree of movement the meshes makes in the leftward of the screen
 
@@ -67,6 +72,25 @@ public class Level {
 		}
 		bird.update();
 	}
+	
+	
+	
+	
+	
+	
+	public void renderPipe(int index) {
+
+		Shader.PIPE.enable();
+		Shader.PIPE.setUniform4f("vw_matrix", Matrix4f.translate(pipes[index].getPosition()));
+		Pipe.getTexture().bind();
+		Pipe.getMesh().render();
+
+		Shader.PIPE.disable();
+		Pipe.getMesh().unbind();
+		Pipe.getTexture().unbind();	
+		
+	}
+	
 	// since render's cycle is way faster than update. for this game, it is not really necessary to render cycle this fast. 
 	// there must be split seconds where shaders rendering meshes at the same coordination for hundreds of times but it is less than milliseconds job
 	// so eyes can only perceive background flowing smoothly.
@@ -74,6 +98,7 @@ public class Level {
 		bgTexture.bind();
 		Shader.BG.enable();
 		background.bind();
+		
 		
 		// 3 is used to put together three copies of images
 		// The Model matrix 
@@ -83,11 +108,12 @@ public class Level {
 		for(int i = map; i < map + 4 ; i++ )
 		{
 			Shader.BG.setUniform4f("ml_matrix", Matrix4f.translate(new Vector3f(i * 10 + xScroll*0.03f, 0.0f, 0.0f)));
-			//background.draw();
+			background.draw();
 		}
 
+		Shader.PIPE.setUniform4f("ml_matrix", Matrix4f.translate(new Vector3f( xScroll*0.03f, 0.0f, 0.0f)));
 		for(int i=0 ; i <5*2; i++)
-			pipes[i].render();
+			renderPipe(i);
 		
 		Shader.BG.disable();
 		bgTexture.unbind();

@@ -47,17 +47,22 @@ public class Pipe {
 		position.y = y;
 	
 	}
-	public void render() {
 
-		Shader.PIPE.enable();
-		Shader.PIPE.setUniform4f("ml_matrix", Matrix4f.translate(position));
-		texture.bind();
-		mesh.render();
-
-		Shader.PIPE.disable();
-		mesh.unbind();
-		texture.unbind();	
-		
+	public Vector3f getPosition() {
+		return position;
 	}
+
+	public static Texture getTexture() {
+		return texture;
+	}
+
+	public void setPosition(Vector3f position) {
+		this.position = position;
+	}
+
+	public static VertexArray getMesh() {
+		return mesh;
+	}
+
 	
 }
