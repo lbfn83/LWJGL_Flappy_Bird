@@ -94,6 +94,12 @@ public class Level {
 
 		Shader.PIPE.enable();
 		Shader.PIPE.setUniform4f("vw_matrix", Matrix4f.translate(pipes[index].getPosition()));
+		
+		if(index % 2 == 0)
+			Shader.PIPE.setUniform1i("top", 1);
+		else
+			Shader.PIPE.setUniform1i("top", 0);
+		
 		Pipe.getTexture().bind();
 		Pipe.getMesh().render();
 
