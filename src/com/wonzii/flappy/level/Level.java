@@ -12,6 +12,7 @@ public class Level {
 	private Texture bgTexture;
 	private int xScroll = 0;
 	private int map = 0;
+	private int index = 0;
 	private Bird bird;
 	private Pipe[] pipes = new Pipe[5*2];
 	
@@ -45,15 +46,20 @@ public class Level {
 		{
 			pipes[i] = new Pipe(0f +(float)i*2f, 1f);
 			
-			pipes[i+1] = new Pipe(0f +(float)i*2f, -5);
+			pipes[i+1] = new Pipe(0f +(float)i*2f, -5f);
+			
+			index = index + 2;
 		}
 		
 		
 	}
-	
+	// Recycle the pipes 
 	public void updatePipes() 
 	{
+		pipes[index % 10] = new Pipe(pipes[(index-1) % 10].getPosition().x + 5f, 1f);
+		pipes[(index % 10) + 1] = new Pipe(pipes[(index-1) % 10].getPosition().x + 5f, -5f);
 		
+		index = index +2;
 	}
 	
 	public void update() {
@@ -70,6 +76,12 @@ public class Level {
 		{
 			map++;
 		}
+  		if( -xScroll > 300 && -xScroll % 120 == 0 )
+		{
+			updatePipes();
+		}
+		
+		System.out.println(xScroll);
 		bird.update();
 	}
 	

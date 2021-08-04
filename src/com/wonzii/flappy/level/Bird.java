@@ -63,7 +63,7 @@ public class Bird {
 //		{
 //			position.x += 0.1f;			;
 //		}
-		System.out.println("delta : " + delta);
+//		System.out.println("delta : " + delta);
 		position.y -= delta;
 		
 		if( Input.isKeyDown(GLFW_KEY_SPACE))

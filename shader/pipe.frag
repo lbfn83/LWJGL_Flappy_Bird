@@ -8,6 +8,7 @@ in DATA
 }fs_in;
 
 uniform sampler2D tex;
+uniform int top;
 
 void main()
 {

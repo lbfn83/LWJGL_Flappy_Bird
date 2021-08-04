@@ -59,7 +59,7 @@ public class Main implements Runnable {
 		
 		/*Scan code is different from default key binding since it is platform specific*/
 		int scancode = glfwGetKeyScancode(GLFW_KEY_X);
-		System.out.println("Scancode : " + scancode + ", " + GLFW_KEY_X);
+//		System.out.println("Scancode : " + scancode + ", " + GLFW_KEY_X);
 		
 		
 		
@@ -74,12 +74,13 @@ public class Main implements Runnable {
 		glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
 		glEnable(GL_DEPTH_TEST);
 		glActiveTexture(GL_TEXTURE1);
-		System.out.println("OpenGL: " + glGetString(GL_VERSION));
+//		System.out.println("OpenGL: " + glGetString(GL_VERSION));
 		
 		//Is it created as an instance? 
 		//the singleton pattern : restricts the instantiation of a class to one "single" instance.
 		//examine Shader class
 		Shader.loadAll();
+		
 
 		//	Projection matrix. since it is used universally among all the Shader instances, defined in Main class
 		// https://lwjglgamedev.gitbooks.io/3d-game-development-with-lwjgl/content/chapter06/chapter6.html
@@ -139,7 +140,7 @@ public class Main implements Runnable {
 			// to measure UPS and FPS
 			if ( System.currentTimeMillis() - timer > 1000) {
 				timer += 1000;
-				System.out.println(updates + " ups, "+frames + " fps");
+//				System.out.println(updates + " ups, "+frames + " fps");
 				updates = 0;
 				frames = 0;
 			}
@@ -180,7 +181,7 @@ public class Main implements Runnable {
 		int i = glGetError();
 		if ( i != GL_NO_ERROR)
 		{
-			System.out.println(i);
+			System.out.println("LWJGL Error Code :" + i);
 		}
 		
 		
