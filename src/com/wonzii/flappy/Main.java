@@ -87,15 +87,15 @@ public class Main implements Runnable {
 		//  perspective projection and  orthographic projection
 		Matrix4f pr_matrix = Matrix4f.orthographic(-10f, 10f, -10f * 9f / 16f, 10f * 9f / 16f, -1.0f, 1.0f); 
 		
-		Shader.BG.setUniform4f("pr_matrix", pr_matrix);
+		Shader.BG.setUniform4fv("pr_matrix", pr_matrix);
 		//The value should be corresponding with the Texture number defined in glActiveTexture
 		Shader.BG.setUniform1i("tex", 1);
 		
-		Shader.BIRD.setUniform4f("pr_matrix", pr_matrix);
+		Shader.BIRD.setUniform4fv("pr_matrix", pr_matrix);
 		//The value should be corresponding with the Texture number defined in glActiveTexture
 		Shader.BIRD.setUniform1i("tex", 1);
 		
-		Shader.PIPE.setUniform4f("pr_matrix", pr_matrix);
+		Shader.PIPE.setUniform4fv("pr_matrix", pr_matrix);
 		//The value should be corresponding with the Texture number defined in glActiveTexture
 		Shader.PIPE.setUniform1i("tex", 1);
 		
@@ -151,6 +151,8 @@ public class Main implements Runnable {
 				running = false;
 			}
 		}
+		glfwDestroyWindow(window);
+		glfwTerminate();
 	}
 	private void update()
 	{

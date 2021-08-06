@@ -8,9 +8,10 @@ import com.wonzii.flappy.math.Vector3f;
 
 public class Pipe {
 	
-	private static float width = 1.5f, height = 5f;
+	private static float width = 1.5f, height = 8.0f;
 	
 	private Vector3f position = new Vector3f();
+	private Matrix4f ml_Matrix;
 	private static Texture texture;
 	private static VertexArray mesh;
 	
@@ -45,7 +46,16 @@ public class Pipe {
 	{
 		position.x = x;
 		position.y = y;
+		ml_Matrix = Matrix4f.translate(new Vector3f(x,y,0.0f));
+	}
 	
+
+	public Matrix4f getMl_Matrix() {
+		return ml_Matrix;
+	}
+
+	public void setMl_Matrix(Matrix4f ml_Matrix) {
+		this.ml_Matrix = ml_Matrix;
 	}
 
 	public Vector3f getPosition() {

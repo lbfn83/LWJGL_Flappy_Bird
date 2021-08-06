@@ -22,10 +22,10 @@ public class Bird {
 	public Bird() {
 		
 		float[] vertices = new float[] {
-				-size/2.0f, -size/2.0f, 0.1f,
-				-size/2.0f, size/2.0f , 0.1f,
-				size/2.0f, size/2.0f , 0.1f,
-				size/2.0f, -size/2.0f, 0.1f,
+				-size/2.0f, -size/2.0f, 0.2f,
+				-size/2.0f, size/2.0f , 0.2f,
+				size/2.0f, size/2.0f , 0.2f,
+				size/2.0f, -size/2.0f, 0.2f,
 				
 			};
 			
@@ -82,7 +82,7 @@ public class Bird {
 	public void render() {
 
 		Shader.BIRD.enable();
-		Shader.BIRD.setUniform4f("ml_matrix", Matrix4f.translate(position).multiply(Matrix4f.rotate(rot)));
+		Shader.BIRD.setUniform4fv("vw_matrix", Matrix4f.translate(position).multiply(Matrix4f.rotate(rot)));
 		texture.bind();
 		mesh.render();
 
@@ -90,5 +90,9 @@ public class Bird {
 		mesh.unbind();
 		texture.unbind();	
 		
+	}
+	public float getY() {
+		// TODO Auto-generated method stub
+		return position.y;
 	}
 }

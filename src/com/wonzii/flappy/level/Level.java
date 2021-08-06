@@ -1,5 +1,7 @@
 package com.wonzii.flappy.level;
 
+import java.util.Random;
+
 import com.wonzii.flappy.graphics.Shader;
 import com.wonzii.flappy.graphics.Texture;
 import com.wonzii.flappy.graphics.VertexArray;
@@ -15,7 +17,18 @@ public class Level {
 	private int index = 0;
 	private Bird bird;
 	private Pipe[] pipes = new Pipe[5*2];
+	/*random number*/
+	private Random r;
+	/*possible y coordination of the upper pipe*/
+	private final float randomMax = 4f;
+	private final float randomMin = -1.5f;
+	private final float startOffset = 5.0f;
+	private final float pipeCreaRate = 3.0f;
 	
+	private float randomNumGen()
+	{
+		return randomMin + r.nextFloat() * (randomMax - randomMin);
+	}
 	
 	public Level() {
 		float[] vertices = new float[] {
@@ -40,28 +53,43 @@ public class Level {
 		background = new VertexArray(vertices, indices, tcs);
 		bgTexture = new Texture("res/bg.jpeg");
 		bird = new Bird();
+
+		createPipes();
+		  
+	}
+	
+	private void createPipes() {
 		//create vertex array, texture of Pipe class
 		Pipe.createPipes();
+		
+		r = new Random();
+		
+		//coordination of each pipe element
 		for( int i=0; i<2*5; i+=2)
 		{
-			pipes[i] = new Pipe(0f +(float)i*2f, 1f);
+			float yCoord = randomNumGen();
+			float weight = 1f;//r.nextFloat()+0.01f;
 			
-			pipes[i+1] = new Pipe(0f +(float)i*2f, -5f);
+			pipes[i] = new Pipe(startOffset +(float)i*pipeCreaRate*weight, yCoord);
+			// 4 is a gap between up and down / 8 is the length of pipe
+			pipes[i+1] = new Pipe(pipes[i].getPosition().x, yCoord - 4 - 8);
 			
 			index = index + 2;
 		}
 		
-		
 	}
+	
+	
 	// Recycle the pipes 
 	public void updatePipes() 
 	{
-		pipes[index % 10] = new Pipe(pipes[(index-1) % 10].getPosition().x + 5f, 1f);
-		pipes[(index % 10) + 1] = new Pipe(pipes[(index-1) % 10].getPosition().x + 5f, -5f);
+		float yCoord = randomNumGen();
+		pipes[index % 10] = new Pipe(startOffset + (index)*pipeCreaRate, yCoord);
+		pipes[(index % 10) + 1] = new Pipe(pipes[index % 10].getPosition().x,  yCoord - 4 - 8);
 		
 		index = index +2;
 	}
-	
+	          
 	public void update() {
 		//the degree of movement the meshes makes in the leftward of the screen
 
@@ -76,11 +104,11 @@ public class Level {
 		{
 			map++;
 		}
-  		if( -xScroll > 300 && -xScroll % 120 == 0 )
+  		if( -xScroll > 250 && -xScroll % 120 == 0 )
 		{
 			updatePipes();
 		}
-		
+		//This is for calculating tick 
 		System.out.println(xScroll);
 		bird.update();
 	}
@@ -90,19 +118,24 @@ public class Level {
 	
 	
 	
-	public void renderPipe(int index) {
+	public void renderPipe() {
 
 		Shader.PIPE.enable();
-		Shader.PIPE.setUniform4f("vw_matrix", Matrix4f.translate(pipes[index].getPosition()));
-		
-		if(index % 2 == 0)
-			Shader.PIPE.setUniform1i("top", 1);
-		else
-			Shader.PIPE.setUniform1i("top", 0);
+		Shader.PIPE.setUniform2f("bird", 0, bird.getY());
+		Shader.PIPE.setUniform4fv("vw_matrix", Matrix4f.translate(new Vector3f( xScroll*0.05f, 0.0f, 0.0f)));
 		
 		Pipe.getTexture().bind();
-		Pipe.getMesh().render();
+		Pipe.getMesh().bind();
+		
+		for(int i=0; i<2*5;i++)
+		{
+			Shader.PIPE.setUniform1i("top", (i % 2)==0? 1: 0);
 
+			Shader.PIPE.setUniform4fv("ml_matrix", pipes[i].getMl_Matrix());
+			
+			Pipe.getMesh().draw();
+		}
+		
 		Shader.PIPE.disable();
 		Pipe.getMesh().unbind();
 		Pipe.getTexture().unbind();	
@@ -125,13 +158,12 @@ public class Level {
 		// Coordination rule :  
 		for(int i = map; i < map + 4 ; i++ )
 		{
-			Shader.BG.setUniform4f("ml_matrix", Matrix4f.translate(new Vector3f(i * 10 + xScroll*0.03f, 0.0f, 0.0f)));
+			Shader.BG.setUniform4fv("vw_matrix", Matrix4f.translate(new Vector3f(i * 10 + xScroll*0.03f, 0.0f, 0.0f)));
 			background.draw();
 		}
 
-		Shader.PIPE.setUniform4f("ml_matrix", Matrix4f.translate(new Vector3f( xScroll*0.03f, 0.0f, 0.0f)));
-		for(int i=0 ; i <5*2; i++)
-			renderPipe(i);
+			
+		renderPipe();
 		
 		Shader.BG.disable();
 		bgTexture.unbind();
