@@ -27,7 +27,7 @@ void main()
 		}
 		
 	if ( color.w < 1.0)
-	// opague level is not met just discard the texture data.. 
+	// if opaque level is not met, just discard the texture data.. not going to be shown on the display 
 	 		discard;
 	color *= 2.0 / (length(bird - fs_in.position.xy)*0.3 + 0.5) ;
 	//color.w = 1.0;

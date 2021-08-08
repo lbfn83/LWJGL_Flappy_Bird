@@ -163,7 +163,7 @@ public class Main implements Runnable {
 		/* Input testing */
 		if(Input.isKeyDown(GLFW_KEY_SPACE))
 		{
-			  System.out.println("SPACE key binidng is "+GLFW_KEY_SPACE);
+			 // System.out.println("SPACE key binidng is "+GLFW_KEY_SPACE);
 		}
 		if(Input.isKeyDown(GLFW_KEY_ESCAPE))
 		{

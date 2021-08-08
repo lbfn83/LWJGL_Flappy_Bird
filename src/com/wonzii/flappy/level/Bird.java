@@ -82,6 +82,7 @@ public class Bird {
 	public void render() {
 
 		Shader.BIRD.enable();
+//		System.out.println("bird's position : "+ position.x );
 		Shader.BIRD.setUniform4fv("vw_matrix", Matrix4f.translate(position).multiply(Matrix4f.rotate(rot)));
 		texture.bind();
 		mesh.render();
@@ -94,5 +95,13 @@ public class Bird {
 	public float getY() {
 		// TODO Auto-generated method stub
 		return position.y;
+	}
+	public float getX() {
+		// TODO Auto-generated method stub
+		return position.x;
+	}
+	public float getSize() {
+		// TODO Auto-generated method stub
+		return size;
 	}
 }

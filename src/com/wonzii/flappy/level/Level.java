@@ -20,10 +20,12 @@ public class Level {
 	/*random number*/
 	private Random r;
 	/*possible y coordination of the upper pipe*/
-	private final float randomMax = 4f;
-	private final float randomMin = -1.5f;
+	private final float randomMax = 6f;
+	private final float randomMin = -0.0f;
 	private final float startOffset = 5.0f;
 	private final float pipeCreaRate = 3.0f;
+	private float pipeMovingDistance = xScroll * 0.05f;
+	
 	
 	private float randomNumGen()
 	{
@@ -58,6 +60,37 @@ public class Level {
 		  
 	}
 	
+	private boolean collision()
+	{
+		// To be able to compare the real position of bird against the pipe, one way to do it is to know 
+		// the output of vertex shader formula after view and model matrices applied, which is hard
+		// Instead, by reflecting the pipe moving distance calculated from the tick ( xscroll ) into bird, 
+		// the input data of both shader programs can be comparable. 
+		// Pipe has the position configured initially before view matrix and Bird has the position that
+		// reflects the movement of ticks
+		
+		float bx0 = -pipeMovingDistance - bird.getSize()/2;
+		float bx1 = -pipeMovingDistance + bird.getSize()/2;
+		float by0 = bird.getY() - bird.getSize()/2;
+		float by1 =	bird.getY() + bird.getSize()/2;
+		
+		// pipe array position : left lower point is 0, 0 
+		for ( int i = 0; i < 5*2 ; i++)
+		{
+			float px0 = pipes[i].getPosition().x ;
+			float px1 = pipes[i].getPosition().x + Pipe.getWidth();
+			float py0 = pipes[i].getPosition().y;
+			float py1 = pipes[i].getPosition().y + Pipe.getHeight();
+		
+			if( px0 < bx1 && px1 > bx0)
+			{
+				if(py1 > by0 && by1 > py0)
+					System.out.println("collision");
+			}
+		}
+		return false;
+	}
+	
 	private void createPipes() {
 		//create vertex array, texture of Pipe class
 		Pipe.createPipes();
@@ -72,7 +105,8 @@ public class Level {
 			
 			pipes[i] = new Pipe(startOffset +(float)i*pipeCreaRate*weight, yCoord);
 			// 4 is a gap between up and down / 8 is the length of pipe
-			pipes[i+1] = new Pipe(pipes[i].getPosition().x, yCoord - 4 - 8);
+			pipes[i+1] = new Pipe(pipes[i].getPosition().x, yCoord - 5 - 8);
+			
 			
 			index = index + 2;
 		}
@@ -85,8 +119,9 @@ public class Level {
 	{
 		float yCoord = randomNumGen();
 		pipes[index % 10] = new Pipe(startOffset + (index)*pipeCreaRate, yCoord);
-		pipes[(index % 10) + 1] = new Pipe(pipes[index % 10].getPosition().x,  yCoord - 4 - 8);
-		
+		pipes[(index % 10) + 1] = new Pipe(pipes[index % 10].getPosition().x,  yCoord - 5 - 8);
+		System.out.println( "Pips's moving weight of x coodrination: " + xScroll*0.05f);
+		System.out.println( "Pipe's " +index +"th initial  x coodrination: " + pipes[index%10].getPosition().x);
 		index = index +2;
 	}
 	          
@@ -109,20 +144,21 @@ public class Level {
 			updatePipes();
 		}
 		//This is for calculating tick 
-		System.out.println(xScroll);
 		bird.update();
 	}
 	
-	
+
 	
 	
 	
 	
 	public void renderPipe() {
 
+		pipeMovingDistance = xScroll*0.05f;
 		Shader.PIPE.enable();
 		Shader.PIPE.setUniform2f("bird", 0, bird.getY());
-		Shader.PIPE.setUniform4fv("vw_matrix", Matrix4f.translate(new Vector3f( xScroll*0.05f, 0.0f, 0.0f)));
+		
+		Shader.PIPE.setUniform4fv("vw_matrix", Matrix4f.translate(new Vector3f( pipeMovingDistance, 0.0f, 0.0f)));
 		
 		Pipe.getTexture().bind();
 		Pipe.getMesh().bind();
@@ -130,7 +166,8 @@ public class Level {
 		for(int i=0; i<2*5;i++)
 		{
 			Shader.PIPE.setUniform1i("top", (i % 2)==0? 1: 0);
-
+			
+			
 			Shader.PIPE.setUniform4fv("ml_matrix", pipes[i].getMl_Matrix());
 			
 			Pipe.getMesh().draw();
@@ -146,6 +183,7 @@ public class Level {
 	// there must be split seconds where shaders rendering meshes at the same coordination for hundreds of times but it is less than milliseconds job
 	// so eyes can only perceive background flowing smoothly.
 	public void render() {
+		collision();
 		bgTexture.bind();
 		Shader.BG.enable();
 		background.bind();

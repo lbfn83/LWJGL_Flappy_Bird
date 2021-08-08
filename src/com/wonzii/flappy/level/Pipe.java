@@ -74,5 +74,15 @@ public class Pipe {
 		return mesh;
 	}
 
+	public static float getWidth() {
+		// TODO Auto-generated method stub
+		return width;
+	}
+
+	public static float getHeight() {
+		// TODO Auto-generated method stub
+		return height;
+	}
+
 	
 }
