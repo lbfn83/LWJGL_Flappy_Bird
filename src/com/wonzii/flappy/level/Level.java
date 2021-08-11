@@ -10,6 +10,16 @@ import com.wonzii.flappy.math.Vector3f;
 
 public class Level {
 
+	
+	public boolean isGameOver() {
+		return gameOver;
+	}
+
+	public void setGameOver(boolean gameOver) {
+		this.gameOver = gameOver;
+	}
+
+	private boolean gameOver;
 	private VertexArray background;
 	private Texture bgTexture;
 	private int xScroll = 0;
@@ -24,7 +34,7 @@ public class Level {
 	private final float randomMin = -0.0f;
 	private final float startOffset = 5.0f;
 	private final float pipeCreaRate = 3.0f;
-	private float pipeMovingDistance = xScroll * 0.05f;
+	private float pipeMovingDistance;
 	
 	
 	private float randomNumGen()
@@ -129,7 +139,7 @@ public class Level {
 		//the degree of movement the meshes makes in the leftward of the screen
 
 		xScroll--;
-		
+		System.out.println("xScroll : " + xScroll);
 		// 335 and xScroll * 0.03 => 
 		// the width of display is 10 so translation matrix vector starts with i*10
 		// every multiple of 335 will increase the count of map 
@@ -208,5 +218,35 @@ public class Level {
 		bird.render();
 		
 		
+	}
+	public void initBirdPosition()
+	{
+		bird.setPosition(new Vector3f(0f, 0f, 0f));
+	}
+	public void initRender(boolean runBird)
+	{
+		bgTexture.bind();
+		Shader.BG.enable();
+		background.bind();
+		
+		
+		// 3 is used to put together three copies of images
+		// The Model matrix 
+		// http://www.opengl-tutorial.org/beginners-tutorials/tutorial-3-matrices/
+		// View matrix is not the right terminology
+		// Coordination rule :  
+		for(int i = 0; i < 2; i++ )
+		{
+			Shader.BG.setUniform4fv("vw_matrix", Matrix4f.translate(new Vector3f(i * 10, 0.0f, 0.0f)));
+			background.draw();
+		}
+		Shader.BG.disable();
+		bgTexture.unbind();
+		if(runBird)
+		{ 
+			bird.renderBirdInit(3);
+		}
+		
+
 	}
 }

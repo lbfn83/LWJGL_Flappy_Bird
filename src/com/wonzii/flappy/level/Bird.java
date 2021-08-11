@@ -2,6 +2,8 @@ package com.wonzii.flappy.level;
 
 import static org.lwjgl.glfw.GLFW.*;
 
+import java.util.Random;
+
 import com.wonzii.flappy.graphics.Shader;
 import com.wonzii.flappy.graphics.Texture;
 import com.wonzii.flappy.graphics.VertexArray;
@@ -18,6 +20,11 @@ public class Bird {
 	private float rot;
 	private float delta = 0.0f;
 	
+	/*Init screen*/
+	private Random r;
+	/*possible y coordination of the upper pipe*/
+	private final float randomMax = 9.0f;
+	private final float randomMin = -9.0f;
 	
 	public Bird() {
 		
@@ -43,7 +50,7 @@ public class Bird {
 		
 		mesh = new VertexArray(vertices, indices, tcs);
 		texture = new Texture("res/bird.png");
-		
+		r = new Random();
 	}
 	public void update() {
 //		System.out.println(Input.keys[GLFW.GLFW_KEY_UP]);
@@ -91,6 +98,43 @@ public class Bird {
 		mesh.unbind();
 		texture.unbind();	
 		
+	}
+	
+	
+	private float randomNumGen()
+	{
+		return randomMin + r.nextFloat() * (randomMax - randomMin);
+	}
+	
+	public void renderBirdInit(int cnt) {
+
+		float xcoord;
+		float ycoord;
+		
+		Shader.BIRD.enable();
+//		System.out.println("bird's position : "+ position.x );
+		texture.bind();
+		mesh.bind();
+		
+		for(int i = 0 ; i < cnt; i++)
+		{
+			xcoord = randomNumGen();
+			ycoord = randomNumGen();
+			position.x = xcoord;
+			position.y = ycoord;
+			Shader.BIRD.setUniform4fv("vw_matrix", Matrix4f.translate(position));
+			mesh.draw();
+		}
+		
+
+		Shader.BIRD.disable();
+		mesh.unbind();
+		texture.unbind();	
+		
+	}
+	
+	public void setPosition(Vector3f position) {
+		this.position = position;
 	}
 	public float getY() {
 		// TODO Auto-generated method stub

@@ -5,6 +5,9 @@ import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL13.*;
 import static org.lwjgl.system.MemoryUtil.*;
+import static org.lwjgl.glfw.Callbacks.*;
+import java.util.Date;
+import java.util.Timer;
 
 import org.lwjgl.glfw.GLFWVidMode;
 import org.lwjgl.opengl.GL;
@@ -22,22 +25,23 @@ public class Main implements Runnable {
 
 	private Thread thread;
 	
-	private boolean running = true;
+	private boolean running = false;
+	private boolean started = true;
 	
 	private long window;
 	
 	private Level level;
-	private Bird bird;
 	
-	public void start() {
+	public void start() throws InterruptedException {
 		thread = new Thread(this, "Game");
 		thread.start();
+//		thread.join();
 	}
 	
 	private void init() {
 		if (glfwInit() == false)
 		{
-			//TODO: handle 
+			//TODO: create handle 
 			
 		}
 		glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
@@ -109,10 +113,51 @@ public class Main implements Runnable {
 		//make sure init() can't run on the standard thread. 
 		//because all the parameters derived from level, Shader, and other classes 
 		//defined in this thread
+		// Init the window
 		init();
 		
+		
+		
+		/*Init State*/
+		//TODO : asdf
+//			define dispaly where nothing shows
+		
+		long startTime = System.currentTimeMillis();
+		long elapsedTime = 0L;
+		
+		
+		while(started)
+		{
+			//Signal to start the game
+			if(Input.isKeyDown(GLFW_KEY_SPACE))
+			{
+				running = true;
+				started = false;
+				// System.out.println("SPACE key binidng is "+GLFW_KEY_SPACE);
+			}
+			if(Input.isKeyDown(GLFW_KEY_ESCAPE))
+			{
+				glfwSetWindowShouldClose(window, true);
+			}
+			if(glfwWindowShouldClose(window) == true )
+			{
+				started = false;
+				running = false;
+			}
+
+			startTime += 1000;
+			elapsedTime = 0L;
+
+			glfwPollEvents();
+			glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
+			level.initRender(true);
+			glfwSwapBuffers(window);
+				
+			
+		}
+		
+		level.initBirdPosition();
 		/* Below codes are to slow down the update cycle*/
-		long lastTime = System.nanoTime();
 		double delta = 0.0;
 		
 		// why divided by 60? to be able to invoke update() 60 times per every second
@@ -121,7 +166,7 @@ public class Main implements Runnable {
 		long timer = System.currentTimeMillis();
 		int updates = 0;
 		int frames = 0;
-		
+		long lastTime = System.nanoTime();
 		
 		while(running)
 		{
@@ -151,9 +196,15 @@ public class Main implements Runnable {
 				running = false;
 			}
 		}
+		// Free the window callbacks and destroy the window
+		glfwFreeCallbacks(window);
 		glfwDestroyWindow(window);
+		
+		// Terminate GLFW and free the error callback
 		glfwTerminate();
+		
 	}
+	
 	private void update()
 	{
 		glfwPollEvents();
@@ -191,8 +242,14 @@ public class Main implements Runnable {
 	}
 	public static void main(String[] args) {
 		// 'new' / instantiate Main class 
-		new Main().start();
+		try {
+			new Main().start();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
+		System.out.println("termination");
 		
 	}
 
