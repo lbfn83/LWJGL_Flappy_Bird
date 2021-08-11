@@ -32,7 +32,7 @@ public class Level {
 	/*possible y coordination of the upper pipe*/
 	private final float randomMax = 6f;
 	private final float randomMin = -0.0f;
-	private final float startOffset = 5.0f;
+	private final float startOffset = 10.0f;
 	private final float pipeCreaRate = 3.0f;
 	private float pipeMovingDistance;
 	
@@ -149,7 +149,7 @@ public class Level {
 		{
 			map++;
 		}
-  		if( -xScroll > 250 && -xScroll % 120 == 0 )
+  		if( -xScroll > 400 && -xScroll % 120 == 0 )
 		{
 			updatePipes();
 		}
