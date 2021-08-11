@@ -223,7 +223,7 @@ public class Level {
 	{
 		bird.setPosition(new Vector3f(0f, 0f, 0f));
 	}
-	public void initRender(boolean runBird)
+	public void initRender(boolean addBird)
 	{
 		bgTexture.bind();
 		Shader.BG.enable();
@@ -242,10 +242,7 @@ public class Level {
 		}
 		Shader.BG.disable();
 		bgTexture.unbind();
-		if(runBird)
-		{ 
-			bird.renderBirdInit(3);
-		}
+		bird.renderBirdInit(addBird);
 		
 
 	}

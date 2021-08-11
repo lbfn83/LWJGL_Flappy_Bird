@@ -103,6 +103,7 @@ public class Main implements Runnable {
 		//The value should be corresponding with the Texture number defined in glActiveTexture
 		Shader.PIPE.setUniform1i("tex", 1);
 		
+		//TODO : 이건 game over가 되었을 때... 다시 한 번 불러와서.. 초기화해줘야 할  
 		level = new Level();
 		
 	}
@@ -124,10 +125,22 @@ public class Main implements Runnable {
 		
 		long startTime = System.currentTimeMillis();
 		long elapsedTime = 0L;
-		
+		boolean addBird = false;
 		
 		while(started)
 		{
+			if(elapsedTime > 1000)
+			{
+				addBird = true;
+				startTime += 1000;
+				elapsedTime = 0L;
+			}else
+			{
+				addBird = false;
+				elapsedTime = System.currentTimeMillis() - startTime;
+			}
+
+			
 			//Signal to start the game
 			if(Input.isKeyDown(GLFW_KEY_SPACE))
 			{
@@ -145,12 +158,10 @@ public class Main implements Runnable {
 				running = false;
 			}
 
-			startTime += 1000;
-			elapsedTime = 0L;
 
 			glfwPollEvents();
 			glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
-			level.initRender(true);
+			level.initRender(addBird);
 			glfwSwapBuffers(window);
 				
 			
