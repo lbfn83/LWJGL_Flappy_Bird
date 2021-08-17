@@ -86,7 +86,7 @@ public class Main implements Runnable {
 		//examine Shader class
 		Shader.loadAll();
 		
-as
+
 		//	Projection matrix. since it is used universally among all the Shader instances, defined in Main class
 		// https://lwjglgamedev.gitbooks.io/3d-game-development-with-lwjgl/content/chapter06/chapter6.html
 		//  perspective projection and  orthographic projection
