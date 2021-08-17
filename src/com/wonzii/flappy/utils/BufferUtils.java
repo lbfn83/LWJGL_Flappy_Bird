@@ -4,6 +4,7 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
+import java.util.List;
 // Helper class : not instaiated
 public class BufferUtils {
 	private BufferUtils() {
@@ -35,4 +36,13 @@ public class BufferUtils {
 		result.put(array).flip();
 		return result;
 	}
+	
+    public static float[] listToArray(List<Float> list) {
+        int size = list != null ? list.size() : 0;
+        float[] floatArr = new float[size];
+        for (int i = 0; i < size; i++) {
+            floatArr[i] = list.get(i);
+        }
+        return floatArr;
+    }
 }

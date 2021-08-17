@@ -22,6 +22,14 @@ public class Texture {
 	private int width, height;
 	private int texture;
 	
+	public int getWidth() {
+		return width;
+	}
+
+	public int getHeight() {
+		return height;
+	}
+
 	public Texture(String path)
 	{
 			texture = load2(path);

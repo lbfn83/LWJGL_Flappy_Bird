@@ -27,6 +27,7 @@ public class Level {
 	private int index = 0;
 	private Bird bird;
 	private Pipe[] pipes = new Pipe[5*2];
+	private Hud hud;
 	/*random number*/
 	private Random r;
 	/*possible y coordination of the upper pipe*/
@@ -35,6 +36,8 @@ public class Level {
 	private final float startOffset = 10.0f;
 	private final float pipeCreaRate = 3.0f;
 	private float pipeMovingDistance;
+	
+	
 	
 	
 	private float randomNumGen()
@@ -67,7 +70,14 @@ public class Level {
 		bird = new Bird();
 
 		createPipes();
-		  
+		
+	//TODO: test
+		try {
+			hud = new Hud("test");
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
 	private boolean collision()
@@ -216,6 +226,7 @@ public class Level {
 		Shader.BG.disable();
 		bgTexture.unbind();
 		bird.render();
+
 		
 		
 	}
@@ -243,7 +254,8 @@ public class Level {
 		Shader.BG.disable();
 		bgTexture.unbind();
 		bird.renderBirdInit(addBird);
-		
+		//TODO: test
+		hud.getStatusTextItem().renderText();
 
 	}
 }

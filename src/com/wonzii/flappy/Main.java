@@ -17,6 +17,7 @@ import com.wonzii.flappy.input.Input;
 import com.wonzii.flappy.level.Bird;
 import com.wonzii.flappy.level.Level;
 import com.wonzii.flappy.math.Matrix4f;
+import com.wonzii.flappy.math.Vector3f;
 
 public class Main implements Runnable {
 
@@ -90,7 +91,7 @@ public class Main implements Runnable {
 		// https://lwjglgamedev.gitbooks.io/3d-game-development-with-lwjgl/content/chapter06/chapter6.html
 		//  perspective projection and  orthographic projection
 		Matrix4f pr_matrix = Matrix4f.orthographic(-10f, 10f, -10f * 9f / 16f, 10f * 9f / 16f, -1.0f, 1.0f); 
-		
+		Matrix4f pr_matrix2 = Matrix4f.orthographic(-200f, 200f, -200f, 200f, -1.0f, 1.0f); 	
 		Shader.BG.setUniform4fv("pr_matrix", pr_matrix);
 		//The value should be corresponding with the Texture number defined in glActiveTexture
 		Shader.BG.setUniform1i("tex", 1);
@@ -102,6 +103,10 @@ public class Main implements Runnable {
 		Shader.PIPE.setUniform4fv("pr_matrix", pr_matrix);
 		//The value should be corresponding with the Texture number defined in glActiveTexture
 		Shader.PIPE.setUniform1i("tex", 1);
+		
+		Shader.TEXT.setUniform4fv("pr_matrix", pr_matrix2);
+		//The value should be corresponding with the Texture number defined in glActiveTexture
+		Shader.TEXT.setUniform1i("tex", 1);		
 		
 		//TODO : 이건 game over가 되었을 때... 다시 한 번 불러와서.. 초기화해줘야 할  
 		level = new Level();

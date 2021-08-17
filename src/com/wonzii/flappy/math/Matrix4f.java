@@ -34,7 +34,6 @@ public class Matrix4f {
 		
 		return result;
 	}
-	
 	public static Matrix4f orthographic(float left, float right, float bottom, float top, float near, float far) {
 		Matrix4f result = identity();
 		//https://www.scratchapixel.com/lessons/3d-basic-rendering/perspective-and-orthographic-projection-matrix/orthographic-projection-matrix
@@ -70,6 +69,7 @@ public class Matrix4f {
 		return result;
 	}
 	
+	
 	//move the object 
 	//column major ordering
 	public static Matrix4f translate(Vector3f vector)
@@ -81,6 +81,18 @@ public class Matrix4f {
 		result.elements[2 + 3 * 4] = vector.z;
 	
 				
+		return result;
+	}
+//	http://www.opengl-tutorial.org/beginners-tutorials/tutorial-3-matrices/
+//	TransformedVector = TranslationMatrix * RotationMatrix * ScaleMatrix * OriginalVector;
+	public static Matrix4f scale(float scale)
+	{
+		Matrix4f result = identity();
+
+		result.elements[0 + 0*4] *= scale;
+		result.elements[1 + 1*4] *= scale;
+		result.elements[2 + 2*4] *= scale;
+		
 		return result;
 	}
 	// Rotation around the Z-axis / https://learnopengl.com/Getting-started/Transformations

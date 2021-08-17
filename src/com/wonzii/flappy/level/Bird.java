@@ -30,8 +30,8 @@ public class Bird {
 	/*Init screen*/
 	private Random r;
 	/*possible y coordination of the upper pipe*/
-	private final float randomMax = 8.0f;
-	private final float randomMin = -8.0f;
+	private final float randomMax = 5.0f;
+	private final float randomMin = -5.0f;
 	
 	public Bird() {
 		

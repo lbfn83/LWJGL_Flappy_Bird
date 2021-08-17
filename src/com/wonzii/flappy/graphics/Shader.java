@@ -6,6 +6,7 @@ import static org.lwjgl.opengl.GL20.*;
 
 import com.wonzii.flappy.math.Matrix4f;
 import com.wonzii.flappy.math.Vector3f;
+import com.wonzii.flappy.math.Vector4f;
 import com.wonzii.flappy.utils.ShaderUtils;
 
 //the singleton pattern : restricts the instantiation of a class to one "single" instance.
@@ -16,7 +17,7 @@ public class Shader {
 	public static final int VERTEX_ATTRIB = 0;
 	public static final int TCOORD_ATTRIB = 1;
 	
-	public static Shader BG, BIRD, PIPE, FADE;
+	public static Shader BG, BIRD, PIPE, FADE, TEXT;
 	
 	private boolean enabled = false;
 	
@@ -33,6 +34,7 @@ public class Shader {
  		BG = new Shader("shader/bg.vert", "shader/bg.frag");
 		BIRD = new Shader("shader/bird.vert", "shader/bird.frag");
 		PIPE = new Shader("shader/pipe.vert", "shader/pipe.frag");
+		TEXT = new Shader("shader/text.vert", "shader/text.frag");
 //		FADE = new Shader("shader/fade.vert", "shader/fade.frag");
 	}
 	//Uniform 변수의 location을 알려주는 거다. uniform 변수의 값 자체는 get할 이유는 없다.. set 만 있을 뿐
@@ -76,6 +78,12 @@ public class Shader {
 		if(!enabled)
 			enable();
 		glUniform3f(getUniform(name), vector.x, vector.y, vector.z);
+	}
+	public void setUniform4f(String name, Vector4f vector)
+	{
+		if(!enabled)
+			enable();
+		glUniform4f(getUniform(name), vector.x, vector.y, vector.z, vector.w);
 	}
 	public void setUniform4fv(String name, Matrix4f matrix)
 	{
