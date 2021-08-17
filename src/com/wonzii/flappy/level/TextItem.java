@@ -33,6 +33,7 @@ public class TextItem {
     
     private final int numRows;
     
+    private final int numChar;
     
     
     public TextItem(String text, String fontFileName, int numCols, int numRows) throws Exception 
@@ -40,6 +41,7 @@ public class TextItem {
         this.text = text;
         this.numCols = numCols;
         this.numRows = numRows;
+        this.numChar = text.length();
         texture = new Texture(fontFileName);
         mesh = buildMesh(texture, numCols, numRows);
     }
@@ -98,12 +100,16 @@ public class TextItem {
             indices.add(i*VERTICES_PER_QUAD);
             indices.add(i*VERTICES_PER_QUAD + 2);
         }
-    
+   
+ //		TODO : 최종 본에서는 지워야 할 부분       
+//		Byte Array :         
 //        byte[] indicesByteArray = new byte[indices.size()]; 
 //       indices.stream().map(Integer::byteValue).forEach((x) -> { x.byteValue();});
-//        
+//		indices.stream().map(Integer::byteValue).collect(Collectors);
+       
+        
+        /*List type to primitive data types like byte or float type*/
         byte[] indicesByteArray = new byte[indices.size()];
-        //indices.stream().map(Integer::byteValue).collect(Collectors);
         for(int i = 0 ; i < indices.size(); i++)
         {
         	indicesByteArray[i] = indices.get(i).byteValue();
@@ -125,9 +131,9 @@ public class TextItem {
     	texture.bind();
     	mesh.bind();
     	
-		//TODO : test용 
-		Shader.TEXT.setUniform4f("color", new Vector4f(0f, 0.5f, 0.5f, 0f));	
-		Shader.TEXT.setUniform4fv("vw_matrix", Matrix4f.translate(new Vector3f(-50f, 0f, 0f )).multiply(Matrix4f.scale(0.8f)));
+		Shader.TEXT.setUniform4f("color", new Vector4f(1.0f, 1.0f, 1.0f, 0f));	
+		//TODO texture position should be calculated from the size of texture
+		Shader.TEXT.setUniform4fv("vw_matrix", Matrix4f.translate(new Vector3f(-400.0f + (800f - (float)texture.getWidth()/(float)numCols*(float)numChar)/2.0f, 0f, 0f )).multiply(Matrix4f.scale(1f)));
 		//multiply(Matrix4f.rotate(10f).multiply(Matrix4f.scale(0.f))
     	mesh.draw();
     	

@@ -91,7 +91,14 @@ public class Main implements Runnable {
 		// https://lwjglgamedev.gitbooks.io/3d-game-development-with-lwjgl/content/chapter06/chapter6.html
 		//  perspective projection and  orthographic projection
 		Matrix4f pr_matrix = Matrix4f.orthographic(-10f, 10f, -10f * 9f / 16f, 10f * 9f / 16f, -1.0f, 1.0f); 
-		Matrix4f pr_matrix2 = Matrix4f.orthographic(-200f, 200f, -200f, 200f, -1.0f, 1.0f); 	
+		
+		// Why Text Shader requires bigger orthographic than level Shader?? 
+		// First the size of window itself is already fixed as 1280 by 720
+		// so, bigger orthographic projection only means more detailed positioning of objects inside the projection
+		// Second, should factor in the size of text ( 32 by 64 ) 
+		// Bigger you configure orthographic projection, Smaller the text object inside that projection
+		// In this regard, the projection should be big enough to accomodate an array of text objects
+		Matrix4f pr_matrix2 = Matrix4f.orthographic(-400f, 400f, -400f, 400f, -1.0f, 1.0f); 	
 		Shader.BG.setUniform4fv("pr_matrix", pr_matrix);
 		//The value should be corresponding with the Texture number defined in glActiveTexture
 		Shader.BG.setUniform1i("tex", 1);
@@ -125,8 +132,7 @@ public class Main implements Runnable {
 		
 		
 		/*Init State*/
-		//TODO : asdf
-//			define dispaly where nothing shows
+		//define dispaly where nothing shows
 		
 		long startTime = System.currentTimeMillis();
 		long elapsedTime = 0L;
@@ -257,11 +263,10 @@ public class Main implements Runnable {
 		glfwSwapBuffers(window);
 	}
 	public static void main(String[] args) {
-		// 'new' / instantiate Main class 
+		// 'new' => instantiate Main class implicitly
 		try {
 			new Main().start();
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		

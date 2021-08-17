@@ -27,7 +27,7 @@ public class Level {
 	private int index = 0;
 	private Bird bird;
 	private Pipe[] pipes = new Pipe[5*2];
-	private Hud hud;
+	private Hud startText;
 	/*random number*/
 	private Random r;
 	/*possible y coordination of the upper pipe*/
@@ -73,7 +73,7 @@ public class Level {
 		
 	//TODO: test
 		try {
-			hud = new Hud("test");
+			startText = new Hud("Click to Start");
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -255,7 +255,7 @@ public class Level {
 		bgTexture.unbind();
 		bird.renderBirdInit(addBird);
 		//TODO: test
-		hud.getStatusTextItem().renderText();
+		startText.getStatusTextItem().renderText();
 
 	}
 }
