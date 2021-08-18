@@ -140,8 +140,8 @@ public class Level {
 		float yCoord = randomNumGen();
 		pipes[index % 10] = new Pipe(startOffset + (index)*pipeCreaRate, yCoord);
 		pipes[(index % 10) + 1] = new Pipe(pipes[index % 10].getPosition().x,  yCoord - 5 - 8);
-		System.out.println( "Pips's moving weight of x coodrination: " + xScroll*0.05f);
-		System.out.println( "Pipe's " +index +"th initial  x coodrination: " + pipes[index%10].getPosition().x);
+//		System.out.println( "Pips's moving weight of x coodrination: " + xScroll*0.05f);
+//		System.out.println( "Pipe's " +index +"th initial  x coodrination: " + pipes[index%10].getPosition().x);
 		index = index +2;
 	}
 	          
@@ -149,7 +149,7 @@ public class Level {
 		//the degree of movement the meshes makes in the leftward of the screen
 
 		xScroll--;
-		System.out.println("xScroll : " + xScroll);
+//		System.out.println("xScroll : " + xScroll);
 		// 335 and xScroll * 0.03 => 
 		// the width of display is 10 so translation matrix vector starts with i*10
 		// every multiple of 335 will increase the count of map 

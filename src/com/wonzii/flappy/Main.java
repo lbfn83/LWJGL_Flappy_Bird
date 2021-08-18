@@ -20,20 +20,44 @@ import com.wonzii.flappy.math.Matrix4f;
 import com.wonzii.flappy.math.Vector3f;
 
 public class Main implements Runnable {
-
+	
+	StateMachine gameState;
+	
 	private int width = 1280;
 	private int height = 720;
 
 	private Thread thread;
 	
 	private boolean running = false;
-	private boolean started = true;
+	private boolean started = false;
+	private boolean aborted = false;
 	
 	private long window;
 	
 	private Level level;
 	
 	public void start() throws InterruptedException {
+		
+		gameState = StateMachine.StartScreen;
+		while(gameState != StateMachine.Aborted)
+		{
+			switch(gameState)
+			{
+			case StartScreen:
+				System.out.println("StartScreen");
+				gameState = gameState.nextState(true, false);
+				break;
+			case Running:
+				System.out.println("Running");
+				gameState = gameState.nextState(false, true);
+				break;
+
+			case GameOver:
+				
+				break;
+			}
+		}
+		
 		thread = new Thread(this, "Game");
 		thread.start();
 //		thread.join();
@@ -129,16 +153,12 @@ public class Main implements Runnable {
 		// Init the window
 		init();
 		
-		
-		
-		/*Init State*/
-		//define dispaly where nothing shows
-		
 		long startTime = System.currentTimeMillis();
 		long elapsedTime = 0L;
 		boolean addBird = false;
 		
-		while(started)
+		/* State1: Start Screen */
+		while(!started && !aborted)
 		{
 			if(elapsedTime > 1000)
 			{
@@ -156,17 +176,17 @@ public class Main implements Runnable {
 			if(Input.isKeyDown(GLFW_KEY_SPACE))
 			{
 				running = true;
-				started = false;
+				started = true;
 				// System.out.println("SPACE key binidng is "+GLFW_KEY_SPACE);
 			}
+			// Signal to the state transition into Abort State
 			if(Input.isKeyDown(GLFW_KEY_ESCAPE))
 			{
 				glfwSetWindowShouldClose(window, true);
 			}
 			if(glfwWindowShouldClose(window) == true )
 			{
-				started = false;
-				running = false;
+				aborted = true;
 			}
 
 
@@ -190,7 +210,7 @@ public class Main implements Runnable {
 		int frames = 0;
 		long lastTime = System.nanoTime();
 		
-		while(running)
+		while(running&&started)
 		{
 			long now = System.nanoTime();
 			delta += (now - lastTime) / ns;
@@ -218,6 +238,11 @@ public class Main implements Runnable {
 				running = false;
 			}
 		}
+		
+		
+		
+		/*State4 : Abort State*/
+		
 		// Free the window callbacks and destroy the window
 		glfwFreeCallbacks(window);
 		glfwDestroyWindow(window);
