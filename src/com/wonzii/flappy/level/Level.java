@@ -2,6 +2,7 @@ package com.wonzii.flappy.level;
 
 import java.util.Random;
 
+import com.wonzii.flappy.StateMachine;
 import com.wonzii.flappy.graphics.Shader;
 import com.wonzii.flappy.graphics.Texture;
 import com.wonzii.flappy.graphics.VertexArray;
@@ -19,6 +20,13 @@ public class Level {
 		this.gameOver = gameOver;
 	}
 
+	public void resetxScroll() {
+		this.xScroll = 0;
+	}
+	public void resetmap() {
+		this.map = 0;
+	}
+
 	private boolean gameOver;
 	private VertexArray background;
 	private Texture bgTexture;
@@ -28,6 +36,7 @@ public class Level {
 	private Bird bird;
 	private Pipe[] pipes = new Pipe[5*2];
 	private Hud startText;
+	private Hud gameoverText;
 	/*random number*/
 	private Random r;
 	/*possible y coordination of the upper pipe*/
@@ -74,6 +83,7 @@ public class Level {
 	//TODO: test
 		try {
 			startText = new Hud("Click to Start");
+			gameoverText = new Hud("Game Over");
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -101,13 +111,20 @@ public class Level {
 			float px1 = pipes[i].getPosition().x + Pipe.getWidth();
 			float py0 = pipes[i].getPosition().y;
 			float py1 = pipes[i].getPosition().y + Pipe.getHeight();
-		
+	
 			if( px0 < bx1 && px1 > bx0)
 			{
 				if(py1 > by0 && by1 > py0)
+				{	
 					System.out.println("collision");
 					return true;
+				}
 			}
+		}
+		//touch the ground
+		if(by0 < -10)
+		{
+			return true;
 		}
 		return false;
 	}
@@ -132,6 +149,26 @@ public class Level {
 			index = index + 2;
 		}
 		
+	}
+	public void repositionPipes()
+	{
+		// reset required; Pipe's positioning is based on index
+		index = 0;
+		r = new Random();
+		
+		//coordination of each pipe element
+		for( int i=0; i<2*5; i+=2)
+		{
+			float yCoord = randomNumGen();
+			float weight = 1f;//r.nextFloat()+0.01f;
+			
+			pipes[i] = new Pipe(startOffset +(float)i*pipeCreaRate*weight, yCoord);
+			// 4 is a gap between up and down / 8 is the length of pipe
+			pipes[i+1] = new Pipe(pipes[i].getPosition().x, yCoord - 5 - 8);
+			
+			
+			index = index + 2;
+		}
 	}
 	
 	
@@ -204,7 +241,7 @@ public class Level {
 	// there must be split seconds where shaders rendering meshes at the same coordination for hundreds of times but it is less than milliseconds job
 	// so eyes can only perceive background flowing smoothly.
 	public void render() {
-		collision();
+		setGameOver(collision());
 		bgTexture.bind();
 		Shader.BG.enable();
 		background.bind();
@@ -235,7 +272,7 @@ public class Level {
 	{
 		bird.setPosition(new Vector3f(0f, 0f, 0f));
 	}
-	public void initRender(boolean addBird)
+	public void renderStartScreen(boolean addBird)
 	{
 		bgTexture.bind();
 		Shader.BG.enable();
@@ -254,9 +291,26 @@ public class Level {
 		}
 		Shader.BG.disable();
 		bgTexture.unbind();
+		
 		bird.renderBirdInit(addBird);
-		//TODO: test
 		startText.getStatusTextItem().renderText();
-
+			
+	}
+	public void renderGameOver()
+	{
+		bgTexture.bind();
+		Shader.BG.enable();
+		background.bind();
+		
+		//Attain the value of xScroll, so Gameover BG pic looks like smoothly extended from where BG were placed when collision was occured in Running State 
+		for(int i = map; i < map+4; i++ )
+		{
+			Shader.BG.setUniform4fv("vw_matrix", Matrix4f.translate(new Vector3f(i * 10 + xScroll*0.03f, 0.0f, 0.0f)));
+			background.draw();
+		}
+		Shader.BG.disable();
+		bgTexture.unbind();
+		gameoverText.getStatusTextItem().renderText();
+	
 	}
 }

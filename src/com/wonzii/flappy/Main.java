@@ -48,7 +48,8 @@ public class Main implements Runnable {
 
 	private Thread thread;
 	
-	private boolean gameover = false;
+	//gameover flag is defined in level
+//	private boolean gameover = false;
 	private boolean started = false;
 	private boolean aborted = false;
 	
@@ -144,6 +145,55 @@ public class Main implements Runnable {
 		
 	}
 	
+
+	 
+	
+//from runnable interface / invoked by thread start()
+	public void run() {
+		
+		//make sure init() can't run on the standard thread. 
+		//because all the parameters derived from level, Shader, and other classes 
+		//defined in this thread
+		// Init the window
+		init();
+		
+		gameState = StateMachine.StartScreen;
+		
+		while(gameState != StateMachine.Aborted)
+		{
+			switch(gameState)
+			{
+			case StartScreen:
+				System.out.println("StartScreen");
+				stateStartScreen();
+				gameState = gameState.nextState(started, aborted);
+				
+				break;
+			case Running:
+				System.out.println("Running");
+				stateRunning();
+				gameState = gameState.nextState(level.isGameOver(), aborted);
+				break;
+
+			case GameOver:
+				System.out.println("GameOver");
+				stateGameOver();
+				gameState = gameState.nextState(level.isGameOver(), aborted);
+				break;
+			}
+		}
+		
+
+		/*State4 : Abort State*/
+		
+		// Free the window callbacks and destroy the window
+		glfwFreeCallbacks(window);
+		glfwDestroyWindow(window);
+		
+		// Terminate GLFW and free the error callback
+		glfwTerminate();
+		
+	}
 	private void stateStartScreen()
 	{
 		/* State1: Start Screen */
@@ -179,16 +229,18 @@ public class Main implements Runnable {
 
 		glfwPollEvents();
 		glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
-		level.initRender(addBird);
+		level.renderStartScreen(addBird);
 		glfwSwapBuffers(window);
 	}
 	
 	private void stateRunning()
 	{
 		if(gameState.getStateJustChanged())
-		{
-			
+		{	
+			level.repositionPipes();
 			level.initBirdPosition();
+			level.resetxScroll();
+			level.resetmap();
 			timer = System.currentTimeMillis();
 			lastTime = System.nanoTime();
 		}
@@ -223,55 +275,34 @@ public class Main implements Runnable {
 			aborted = true;
 		}
 	}
-	 
-	
-//from runnable interface / invoked by thread start()
-	public void run() {
-		
-		//make sure init() can't run on the standard thread. 
-		//because all the parameters derived from level, Shader, and other classes 
-		//defined in this thread
-		// Init the window
-		init();
-		
-		gameState = StateMachine.StartScreen;
-		
-		while(gameState != StateMachine.Aborted)
+	private void stateGameOver() {
+		//  Reset the parameters for objects ( pipe, bird ) in Running State 
+//		if(gameState.getStateJustChanged())
+//		{
+//			level.initBirdPosition();
+//			level.setxScroll(0);
+//		}
+		if(Input.isKeyDown(GLFW_KEY_SPACE))
 		{
-			switch(gameState)
-			{
-			case StartScreen:
-				System.out.println("StartScreen");
-				stateStartScreen();
-				gameState = gameState.nextState(started, aborted);
-				
-				break;
-			case Running:
-				System.out.println("Running");
-				stateRunning();
-				gameState = gameState.nextState(gameover, aborted);
-				break;
-
-			case GameOver:
-				System.out.println("GameOver");
-				
-				gameState = gameState.nextState(gameover, aborted);
-				break;
-			}
+			level.setGameOver(false);
 		}
-		
-
-		/*State4 : Abort State*/
-		
-		// Free the window callbacks and destroy the window
-		glfwFreeCallbacks(window);
-		glfwDestroyWindow(window);
-		
-		// Terminate GLFW and free the error callback
-		glfwTerminate();
-		
+		if(Input.isKeyDown(GLFW_KEY_ESCAPE))
+		{
+			glfwSetWindowShouldClose(window, true);
+			aborted = true;
+		}
+		// Hit 'x' in window
+		if(glfwWindowShouldClose(window) == true )
+		{
+			aborted = true;
+		}
+		glfwPollEvents();
+		glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
+		//First argument is redundant for Gameover state
+		level.renderGameOver();
+		glfwSwapBuffers(window);
 	}
-	
+
 	private void update()
 	{
 		glfwPollEvents();
@@ -305,7 +336,7 @@ public class Main implements Runnable {
 		}
 		
 		
-		glfwSwapBuffers(window);
+		glfwSwapBuffers(window); 
 	}
 	public static void main(String[] args) {
 		// 'new' => instantiate Main class implicitly

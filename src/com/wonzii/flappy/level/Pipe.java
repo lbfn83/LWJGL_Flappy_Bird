@@ -54,10 +54,6 @@ public class Pipe {
 		return ml_Matrix;
 	}
 
-	public void setMl_Matrix(Matrix4f ml_Matrix) {
-		this.ml_Matrix = ml_Matrix;
-	}
-
 	public Vector3f getPosition() {
 		return position;
 	}
