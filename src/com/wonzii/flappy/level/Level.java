@@ -106,6 +106,7 @@ public class Level {
 			{
 				if(py1 > by0 && by1 > py0)
 					System.out.println("collision");
+					return true;
 			}
 		}
 		return false;

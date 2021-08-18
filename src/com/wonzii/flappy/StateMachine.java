@@ -12,10 +12,12 @@ public enum StateMachine {
 			}
 			else if(started)
 			{
+				setStateJustChanged(true);
 				return Running;
 			}
 			else
 			{
+				setStateJustChanged(false);
 				return StartScreen;		
 			}
 		}
@@ -31,10 +33,12 @@ public enum StateMachine {
 			}
 			else if(gameover)
 			{
+				setStateJustChanged(true);
 				return GameOver;
 			}
 			else
 			{
+				setStateJustChanged(false);
 				return Running;		
 			}
 		}
@@ -48,10 +52,12 @@ public enum StateMachine {
 			}
 			else if(!gameover)
 			{
+				setStateJustChanged(true);
 				return Running;
 			}
 			else
 			{
+				setStateJustChanged(false);
 				return GameOver;		
 			}
 		}
@@ -66,13 +72,15 @@ public enum StateMachine {
 	
 	
 	
+	private static boolean stateJustChanged = false;
 	
+	public void setStateJustChanged(boolean flag) {
+		stateJustChanged = flag;
+	}	
+	public boolean getStateJustChanged() {
+		return stateJustChanged;
+	}
 	
-	
-	public float getCurrentTime()
-	{
-		return 1.2f;
-	};
 	public abstract StateMachine nextState(boolean flag, boolean flag2);
 }
 

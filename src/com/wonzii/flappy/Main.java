@@ -23,12 +23,32 @@ public class Main implements Runnable {
 	
 	StateMachine gameState;
 	
+	/*Parameters for StartScreen*/
+	private long startTime = System.currentTimeMillis();;
+	private long elapsedTime = 0L;
+	private boolean addBird = false;
+	/* -------------------------------- */
+	
+	/*Parameters for Running*/
+	/* Below codes are to slow down the update cycle*/
+	double delta = 0.0;
+	// why divided by 60? to be able to invoke update() 60 times per every second
+	// so UPS will be around 60
+	double ns = 1000000000.0/60 ;
+	long timer ;
+	int updates = 0;
+	int frames = 0;
+	long lastTime;
+	/* -------------------------------- */
+	
+	
+	
 	private int width = 1280;
 	private int height = 720;
 
 	private Thread thread;
 	
-	private boolean running = false;
+	private boolean gameover = false;
 	private boolean started = false;
 	private boolean aborted = false;
 	
@@ -37,26 +57,6 @@ public class Main implements Runnable {
 	private Level level;
 	
 	public void start() throws InterruptedException {
-		
-		gameState = StateMachine.StartScreen;
-		while(gameState != StateMachine.Aborted)
-		{
-			switch(gameState)
-			{
-			case StartScreen:
-				System.out.println("StartScreen");
-				gameState = gameState.nextState(true, false);
-				break;
-			case Running:
-				System.out.println("Running");
-				gameState = gameState.nextState(false, true);
-				break;
-
-			case GameOver:
-				
-				break;
-			}
-		}
 		
 		thread = new Thread(this, "Game");
 		thread.start();
@@ -144,6 +144,87 @@ public class Main implements Runnable {
 		
 	}
 	
+	private void stateStartScreen()
+	{
+		/* State1: Start Screen */
+		if(elapsedTime > 1000)
+		{
+			addBird = true;
+			startTime += 1000;
+			elapsedTime = 0L;
+		}else
+		{
+			addBird = false;
+			elapsedTime = System.currentTimeMillis() - startTime;
+		}
+
+
+		//Signal to start the game
+		if(Input.isKeyDown(GLFW_KEY_SPACE))
+		{
+			//				running = true;
+			started = true;
+		}
+		// Signal to the state transition into Abort State
+		if(Input.isKeyDown(GLFW_KEY_ESCAPE))
+		{
+			glfwSetWindowShouldClose(window, true);
+			aborted = true;
+		}
+		// Hit 'x' in window
+		if(glfwWindowShouldClose(window) == true )
+		{
+			aborted = true;
+		}
+
+		glfwPollEvents();
+		glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
+		level.initRender(addBird);
+		glfwSwapBuffers(window);
+	}
+	
+	private void stateRunning()
+	{
+		if(gameState.getStateJustChanged())
+		{
+			
+			level.initBirdPosition();
+			timer = System.currentTimeMillis();
+			lastTime = System.nanoTime();
+		}
+		long now = System.nanoTime();
+		delta += (now - lastTime) / ns;
+		lastTime = now;
+
+		if(delta >= 1.0)
+		{
+			delta--;
+			update();
+			updates++;
+		}
+		render();
+		frames++;
+		// to measure UPS and FPS
+		if ( System.currentTimeMillis() - timer > 1000) {
+			timer += 1000;
+			//				System.out.println(updates + " ups, "+frames + " fps");
+			updates = 0;
+			frames = 0;
+		}
+
+		if(Input.isKeyDown(GLFW_KEY_ESCAPE))
+		{
+			glfwSetWindowShouldClose(window, true);
+			aborted = true;
+		}
+		// Hit 'x' in window
+		if(glfwWindowShouldClose(window) == true )
+		{
+			aborted = true;
+		}
+	}
+	 
+	
 //from runnable interface / invoked by thread start()
 	public void run() {
 		
@@ -153,94 +234,33 @@ public class Main implements Runnable {
 		// Init the window
 		init();
 		
-		long startTime = System.currentTimeMillis();
-		long elapsedTime = 0L;
-		boolean addBird = false;
+		gameState = StateMachine.StartScreen;
 		
-		/* State1: Start Screen */
-		while(!started && !aborted)
+		while(gameState != StateMachine.Aborted)
 		{
-			if(elapsedTime > 1000)
+			switch(gameState)
 			{
-				addBird = true;
-				startTime += 1000;
-				elapsedTime = 0L;
-			}else
-			{
-				addBird = false;
-				elapsedTime = System.currentTimeMillis() - startTime;
-			}
-
-			
-			//Signal to start the game
-			if(Input.isKeyDown(GLFW_KEY_SPACE))
-			{
-				running = true;
-				started = true;
-				// System.out.println("SPACE key binidng is "+GLFW_KEY_SPACE);
-			}
-			// Signal to the state transition into Abort State
-			if(Input.isKeyDown(GLFW_KEY_ESCAPE))
-			{
-				glfwSetWindowShouldClose(window, true);
-			}
-			if(glfwWindowShouldClose(window) == true )
-			{
-				aborted = true;
-			}
-
-
-			glfwPollEvents();
-			glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
-			level.initRender(addBird);
-			glfwSwapBuffers(window);
+			case StartScreen:
+				System.out.println("StartScreen");
+				stateStartScreen();
+				gameState = gameState.nextState(started, aborted);
 				
-			
-		}
-		
-		level.initBirdPosition();
-		/* Below codes are to slow down the update cycle*/
-		double delta = 0.0;
-		
-		// why divided by 60? to be able to invoke update() 60 times per every second
-		// so UPS will be around 60
-		double ns = 1000000000.0/60 ;
-		long timer = System.currentTimeMillis();
-		int updates = 0;
-		int frames = 0;
-		long lastTime = System.nanoTime();
-		
-		while(running&&started)
-		{
-			long now = System.nanoTime();
-			delta += (now - lastTime) / ns;
-			lastTime = now;
-			
-			if(delta >= 1.0)
-			{
-				delta--;
-				update();
-				updates++;
-			}
-			render();
-			frames++;
-			// to measure UPS and FPS
-			if ( System.currentTimeMillis() - timer > 1000) {
-				timer += 1000;
-//				System.out.println(updates + " ups, "+frames + " fps");
-				updates = 0;
-				frames = 0;
-			}
-			
-			
-			if(glfwWindowShouldClose(window) == true )
-			{
-				running = false;
+				break;
+			case Running:
+				System.out.println("Running");
+				stateRunning();
+				gameState = gameState.nextState(gameover, aborted);
+				break;
+
+			case GameOver:
+				System.out.println("GameOver");
+				
+				gameState = gameState.nextState(gameover, aborted);
+				break;
 			}
 		}
 		
-		
-		
+
 		/*State4 : Abort State*/
 		
 		// Free the window callbacks and destroy the window
@@ -294,9 +314,6 @@ public class Main implements Runnable {
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
-		
-		System.out.println("termination");
-		
 	}
 
 }
