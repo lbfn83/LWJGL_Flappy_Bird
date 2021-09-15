@@ -3,3 +3,5 @@ bin/
 /target/
 .classpath
 .project
+*.txt
+!License.txt
