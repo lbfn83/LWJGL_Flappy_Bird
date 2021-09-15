@@ -4,4 +4,4 @@ bin/
 .classpath
 .project
 *.txt
-!License.txt
+!LICENSE.txt
