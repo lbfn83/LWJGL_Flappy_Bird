@@ -3,7 +3,6 @@ package com.wonzii.flappy.graphics;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL20.*;
 import static org.lwjgl.opengl.GL30.*;
-import static org.lwjgl.stb.STBImage.*;
 
 import java.awt.image.BufferedImage;
 import java.io.FileInputStream;
@@ -32,39 +31,12 @@ public class Texture {
 
 	public Texture(String path)
 	{
-			texture = load2(path);
+			texture = load(path);
 
 	}
 	
-	private int load(String fileName)  
-	{
-
-		ByteBuffer buf;
-		
-		try(MemoryStack stack = MemoryStack.stackPush();){
-			IntBuffer w = stack.mallocInt(1);
-			IntBuffer h = stack.mallocInt(1);
-			IntBuffer channels = stack.mallocInt(1);
-			// 4 
-			buf = stbi_load(fileName, w, h, channels, 4);
-		
-			
-			width = w.get();
-			height = h.get();
-		}
-		
-		int textureID = glGenTextures();
-		glBindTexture(GL_TEXTURE_2D, textureID);
-		glPixelStorei(GL_UNPACK_ALIGNMENT, 1 );
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, buf);
-		glGenerateMipmap(GL_TEXTURE_2D);
-		stbi_image_free(buf);
-		glBindTexture(GL_TEXTURE_2D, 0);
-		return textureID;
-	}
 	
-	
-	private int load2(String path) {
+	private int load(String path) {
 		int[] pixels = null;
 		
 		BufferedImage image;
