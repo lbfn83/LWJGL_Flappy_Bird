@@ -16,8 +16,7 @@ import com.wonzii.flappy.math.Vector3f;
 
 public class Bird {
 	
-	private ArrayList<Vector3f> InitBirdCache = new ArrayList<Vector3f>();
-	
+	private ArrayList<Vector3f> birdsCache_StartScreen = new ArrayList<Vector3f>();
 	
 	private VertexArray mesh;
 	private Texture texture;
@@ -27,9 +26,7 @@ public class Bird {
 	private float rot;
 	private float delta = 0.0f;
 	
-	/*Init screen*/
 	private Random r;
-	/*possible y coordination of the upper pipe*/
 	private final float randomMax = 5.0f;
 	private final float randomMin = -5.0f;
 	
@@ -60,6 +57,7 @@ public class Bird {
 		r = new Random();
 		
 	}
+	
 	public void update() {
 //		System.out.println(Input.keys[GLFW.GLFW_KEY_UP]);
 //		if(Input.isKeyDown(GLFW_KEY_UP))
@@ -79,6 +77,7 @@ public class Bird {
 //			position.x += 0.1f;			;
 //		}
 //		System.out.println("delta : " + delta);
+		
 		position.y -= delta;
 		
 		if( Input.isKeyDown(GLFW_KEY_SPACE))
@@ -102,9 +101,9 @@ public class Bird {
 		texture.bind();
 		mesh.render();
 
-		Shader.BIRD.disable();
 		mesh.unbind();
 		texture.unbind();	
+		Shader.BIRD.disable();
 		
 	}
 	
@@ -114,10 +113,10 @@ public class Bird {
 		return randomMin + r.nextFloat() * (randomMax - randomMin);
 	}
 	
-	public void renderBirdInit(boolean addBird) {
+	public void renderBirdStartSceen(boolean updateBirdStartScreen) {
 
 
-		if(addBird)
+		if(updateBirdStartScreen)
 		{
 			float xcoord = randomNumGen();
 			float ycoord = randomNumGen();
@@ -125,11 +124,11 @@ public class Bird {
 			position.y = ycoord;
 			
 			
-			if( InitBirdCache.size() > 10)
+			if( birdsCache_StartScreen.size() > 10)
 			{
-				InitBirdCache.remove(0);
+				birdsCache_StartScreen.remove(0);
 			}
-			InitBirdCache.add(new Vector3f(xcoord, ycoord, 0f));
+			birdsCache_StartScreen.add(new Vector3f(xcoord, ycoord, 0f));
 		}
 		
 		Shader.BIRD.enable();
@@ -137,9 +136,9 @@ public class Bird {
 		texture.bind();
 		mesh.bind();
 		
-		for(int i = 0 ; i < InitBirdCache.size(); i++)
+		for(int i = 0 ; i < birdsCache_StartScreen.size(); i++)
 		{
-			Shader.BIRD.setUniform4fv("vw_matrix", Matrix4f.translate(InitBirdCache.get(i)));
+			Shader.BIRD.setUniform4fv("vw_matrix", Matrix4f.translate(birdsCache_StartScreen.get(i)));
 			mesh.draw();
 		}
 		

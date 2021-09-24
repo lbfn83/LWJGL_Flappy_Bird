@@ -1,5 +1,6 @@
 package com.wonzii.flappy.graphics;
 
+import static org.lwjgl.opengl.GL20.*;
 import static org.lwjgl.opengl.GL30.*;
 
 import com.wonzii.flappy.utils.BufferUtils;

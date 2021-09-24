@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.ArrayList;
 
+import com.wonzii.flappy.StateMachine;
 import com.wonzii.flappy.graphics.Shader;
 import com.wonzii.flappy.graphics.Texture;
 import com.wonzii.flappy.graphics.VertexArray;
@@ -12,6 +13,7 @@ import com.wonzii.flappy.math.Matrix4f;
 import com.wonzii.flappy.math.Vector3f;
 import com.wonzii.flappy.math.Vector4f;
 import com.wonzii.flappy.utils.GenericUtil;
+
 
 public class TextItem {
     
@@ -126,16 +128,65 @@ public class TextItem {
         return text;
     }
     
-    public void renderText() {
+    public void renderText(StateMachine state) {
+    	float scale;
+    	float textxCoord; 
+    	float singleTextWidth = texture.getWidth()/(float)numCols;
+
     	Shader.TEXT.enable();
     	texture.bind();
     	mesh.bind();
     	
-		Shader.TEXT.setUniform4f("color", new Vector4f(1.0f, 1.0f, 1.0f, 0f));	
-		//TODO texture position should be calculated from the size of texture
-		Shader.TEXT.setUniform4fv("vw_matrix", Matrix4f.translate(new Vector3f(-400.0f + (800f - (float)texture.getWidth()/(float)numCols*(float)numChar)/2.0f, 0f, 0f )).multiply(Matrix4f.scale(1f)));
-		//multiply(Matrix4f.rotate(10f).multiply(Matrix4f.scale(0.f))
-    	mesh.draw();
+    	
+    	// single text's size is  32 by 64 
+    	// Screen size is 800 by 800 
+    	
+    	switch(state) {
+    	case StartScreen:
+    		scale = 1f;
+    		textxCoord = -400.0f + (800f - singleTextWidth*(float)numChar*scale)/2.0f;
+    		
+    		Shader.TEXT.setUniform4f("color", new Vector4f(1.0f, 1.0f, 1.0f, 0f));	
+    		// texture position should be calculated from the size of texts and their scale
+    		Shader.TEXT.setUniform4fv("vw_matrix", Matrix4f.translate(new Vector3f(textxCoord, 0f, 0f )).multiply(Matrix4f.scale(scale)));
+    		mesh.draw();
+    		break;
+    		
+    	case Running:
+    		scale = 0.5f;
+    		textxCoord = -400.0f + (800f - singleTextWidth*(float)numChar*scale)/2.0f;
+    		
+    		String scoreText = "Score : ";
+    		int lengScoreText = scoreText.length();
+    		
+    		if(this.text.compareTo(scoreText) == 0)
+    		{
+    			
+    			Shader.TEXT.setUniform4f("color", new Vector4f(1.0f, 0.8f, 1.0f, 0f));	
+    			Shader.TEXT.setUniform4fv("vw_matrix", Matrix4f.translate(new Vector3f(textxCoord,350f, 0f )).multiply(Matrix4f.scale(scale)));
+    		}else
+    		{
+    			/* Actual score is dynamically changing */
+         			Shader.TEXT.setUniform4f("color", new Vector4f(1.0f, 0.8f, 1.0f, 0f));	
+    			Shader.TEXT.setUniform4fv("vw_matrix", Matrix4f.translate(new Vector3f(textxCoord + lengScoreText*scale*singleTextWidth,350f, 0f )).multiply(Matrix4f.scale(scale)));
+    	
+    		}
+    		mesh.draw();
+    		break;
+    	case GameOver:
+    		scale = 2f;
+    		textxCoord = -400.0f + (800f - singleTextWidth*(float)numChar*scale)/2.0f;
+    		
+    		Shader.TEXT.setUniform4f("color", new Vector4f(0.5f, 0.0f, 0.25f, 0f));	
+    		// texture position should be calculated from the size of texts and their scale
+    		Shader.TEXT.setUniform4fv("vw_matrix", Matrix4f.translate(new Vector3f(textxCoord, 0f, 0f )).multiply(Matrix4f.scale(scale)));
+    		//multiply(Matrix4f.rotate(10f).multiply(Matrix4f.scale(0.f))
+    		mesh.draw();
+    		break;
+    	default:
+    		System.out.println("No such State!");
+    	
+    	}
     	
 		Shader.TEXT.disable();
 		mesh.unbind();

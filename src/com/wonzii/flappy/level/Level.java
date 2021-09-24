@@ -19,14 +19,9 @@ public class Level {
 	public void setGameOver(boolean gameOver) {
 		this.gameOver = gameOver;
 	}
-
-	public void resetxScroll() {
-		this.xScroll = 0;
-	}
-	public void resetmap() {
-		this.map = 0;
-	}
-
+	private boolean[] birdIsInPipearea;
+	private float prevBx0, prevBx1;
+	private int score = 0;
 	private boolean gameOver;
 	private VertexArray background;
 	private Texture bgTexture;
@@ -37,9 +32,11 @@ public class Level {
 	private Pipe[] pipes = new Pipe[5*2];
 	private Hud startText;
 	private Hud gameoverText;
+	private Hud scoreText1;
+	private Hud scoreText2;
 	/*random number*/
 	private Random r;
-	/*possible y coordination of the upper pipe*/
+	/* the range of y coordination of the upper pipe*/
 	private final float randomMax = 6f;
 	private final float randomMin = -0.0f;
 	private final float startOffset = 10.0f;
@@ -84,10 +81,74 @@ public class Level {
 		try {
 			startText = new Hud("Click to Start");
 			gameoverText = new Hud("Game Over");
+			scoreText1 = new Hud("Score : ");
+			scoreText2 = new Hud("0");
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		
+		birdIsInPipearea = new boolean[2*5];
+		
+	}
+	private void createPipes() {
+		//create mesh for PIPE class
+		Pipe.createPipes();
+		
+		r = new Random();
+		
+		//coordination of each pipe element
+		for( int i=0; i<2*5; i+=2)
+		{
+			float yCoord = randomNumGen();
+			float weight = 1f;//r.nextFloat()+0.01f;
+			
+			pipes[i] = new Pipe(startOffset +(float)i*pipeCreaRate*weight, yCoord);
+			// 4 is a gap between up and down / 8 is the length of pipe
+			pipes[i+1] = new Pipe(pipes[i].getPosition().x, yCoord - 5 - 8);
+			
+			
+			index = index + 2;
+		}
+		
+	}
+	
+	private void scoreCount(StateMachine gameState)
+	{
+		//좌표가 계속 다이나믹하게 움직이는 건 bird네. 
+		float bx0 = -pipeMovingDistance - bird.getSize()/2;
+		float bx1 = -pipeMovingDistance + bird.getSize()/2;
+		/*if game has just started skip the below code*/
+		if (!gameState.getStateJustChanged())
+		{
+			// only count upper pipe?
+			for ( int i = 0; i < 2*5 ; i= i+2)
+			{ 
+				float px0 = pipes[i].getPosition().x ;
+				float px1 = pipes[i].getPosition().x + Pipe.getWidth();
+ 				if((px0 < prevBx1 && px1 > prevBx0 ) &&  (px0 < bx1 && px1 > bx0) && !birdIsInPipearea[i])
+				{
+   					score++;
+					birdIsInPipearea[i] = true;
+					//TODO 이 아래 있는건... score 더할 때만 해주기로 하자
+					try {
+						scoreText2 = new Hud(String.valueOf(score));
+					} catch (Exception e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}else if(!(px0 < bx1 && px1 > bx0))
+				{
+					birdIsInPipearea[i] = false;
+				}
+					
+			}
+			
+		}
+		
+		prevBx0 = bx0;
+		prevBx1 = bx1;
+		
 	}
 	
 	private boolean collision()
@@ -111,9 +172,10 @@ public class Level {
 			float px1 = pipes[i].getPosition().x + Pipe.getWidth();
 			float py0 = pipes[i].getPosition().y;
 			float py1 = pipes[i].getPosition().y + Pipe.getHeight();
-	
+			
 			if( px0 < bx1 && px1 > bx0)
 			{
+
 				if(py1 > by0 && by1 > py0)
 				{	
 					System.out.println("collision");
@@ -121,6 +183,8 @@ public class Level {
 				}
 			}
 		}
+
+		
 		//touch the ground
 		if(by0 < -10)
 		{
@@ -129,28 +193,31 @@ public class Level {
 		return false;
 	}
 	
-	private void createPipes() {
-		//create vertex array, texture of Pipe class
-		Pipe.createPipes();
-		
-		r = new Random();
-		
-		//coordination of each pipe element
-		for( int i=0; i<2*5; i+=2)
-		{
-			float yCoord = randomNumGen();
-			float weight = 1f;//r.nextFloat()+0.01f;
-			
-			pipes[i] = new Pipe(startOffset +(float)i*pipeCreaRate*weight, yCoord);
-			// 4 is a gap between up and down / 8 is the length of pipe
-			pipes[i+1] = new Pipe(pipes[i].getPosition().x, yCoord - 5 - 8);
-			
-			
-			index = index + 2;
-		}
-		
+	
+	
+	/******************************************************/
+	//Get the game screen ready for new game play
+	public void initForRunningState()
+	{
+		resetScore();
+		repositionPipes();
+		resetxScroll();
+		resetmap();
+		initBirdPosition();
 	}
-	public void repositionPipes()
+	private void resetScore()
+	{
+		score = 0;
+		try {
+			
+			scoreText2 = new Hud(String.valueOf(score));
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	private void repositionPipes()
 	{
 		// reset required; Pipe's positioning is based on index
 		index = 0;
@@ -170,20 +237,22 @@ public class Level {
 			index = index + 2;
 		}
 	}
-	
-	
-	// Recycle the pipes 
-	public void updatePipes() 
-	{
-		float yCoord = randomNumGen();
-		pipes[index % 10] = new Pipe(startOffset + (index)*pipeCreaRate, yCoord);
-		pipes[(index % 10) + 1] = new Pipe(pipes[index % 10].getPosition().x,  yCoord - 5 - 8);
-//		System.out.println( "Pips's moving weight of x coodrination: " + xScroll*0.05f);
-//		System.out.println( "Pipe's " +index +"th initial  x coodrination: " + pipes[index%10].getPosition().x);
-		index = index +2;
+	private void resetxScroll() {
+		this.xScroll = 0;
 	}
+	private void resetmap() {
+		this.map = 0;
+	}
+	private void initBirdPosition()
+	{
+		bird.setPosition(new Vector3f(0f, 0f, 0f));
+	}
+	
+	/**
+	 * @throws Exception ****************************************************/
+	
 	          
-	public void update() {
+	public void update()  {
 		//the degree of movement the meshes makes in the leftward of the screen
 
 		xScroll--;
@@ -206,12 +275,59 @@ public class Level {
 	}
 	
 
+	// Recycle the pipes 
+	private void updatePipes() 
+	{
+		float yCoord = randomNumGen();
+		pipes[index % 10] = new Pipe(startOffset + (index)*pipeCreaRate, yCoord);
+		pipes[(index % 10) + 1] = new Pipe(pipes[index % 10].getPosition().x,  yCoord - 5 - 8);
+		//	System.out.println( "Pips's moving weight of x coodrination: " + xScroll*0.05f);
+		//	System.out.println( "Pipe's " +index +"th initial  x coodrination: " + pipes[index%10].getPosition().x);
+		index = index +2;
+	}
 	
+	/****************************************/
 	
-	
-	
-	public void renderPipe() {
+	// since render's cycle is way faster than update. for this game, it is not really necessary to render cycle this fast. 
+	// there must be split seconds where shaders rendering meshes at the same coordination for hundreds of times but it is less than milliseconds job
+	// so eyes can only perceive background flowing smoothly.
+	public void render(StateMachine gameState) {
 
+		
+		setGameOver(collision());
+		scoreCount(gameState);
+		
+		bgTexture.bind();
+		Shader.BG.enable();
+		background.bind();
+		
+		
+		// 3 is used to put together three copies of images
+		// The Model matrix 
+		// http://www.opengl-tutorial.org/beginners-tutorials/tutorial-3-matrices/
+		// View matrix is not the right terminology
+		// Coordination rule :  
+		for(int i = map; i < map + 4 ; i++ )
+		{
+			Shader.BG.setUniform4fv("vw_matrix", Matrix4f.translate(new Vector3f(i * 10 + xScroll*0.03f, 0.0f, 0.0f)));
+			background.draw();
+		}
+
+			
+		background.unbind();
+		Shader.BG.disable();
+		bgTexture.unbind();
+
+		renderPipe();
+
+		bird.render();
+		
+		scoreText1.getStatusTextItem().renderText(StateMachine.Running);
+		scoreText2.getStatusTextItem().renderText(StateMachine.Running);
+	}
+	
+	private void renderPipe() {
+		
 		pipeMovingDistance = xScroll*0.05f;
 		Shader.PIPE.enable();
 		Shader.PIPE.setUniform2f("bird", 0, bird.getY());
@@ -231,59 +347,22 @@ public class Level {
 			Pipe.getMesh().draw();
 		}
 		
-		Shader.PIPE.disable();
 		Pipe.getMesh().unbind();
 		Pipe.getTexture().unbind();	
-		
+		Shader.PIPE.disable();
 	}
 	
-	// since render's cycle is way faster than update. for this game, it is not really necessary to render cycle this fast. 
-	// there must be split seconds where shaders rendering meshes at the same coordination for hundreds of times but it is less than milliseconds job
-	// so eyes can only perceive background flowing smoothly.
-	public void render() {
-		setGameOver(collision());
-		bgTexture.bind();
-		Shader.BG.enable();
-		background.bind();
-		
-		
-		// 3 is used to put together three copies of images
-		// The Model matrix 
-		// http://www.opengl-tutorial.org/beginners-tutorials/tutorial-3-matrices/
-		// View matrix is not the right terminology
-		// Coordination rule :  
-		for(int i = map; i < map + 4 ; i++ )
-		{
-			Shader.BG.setUniform4fv("vw_matrix", Matrix4f.translate(new Vector3f(i * 10 + xScroll*0.03f, 0.0f, 0.0f)));
-			background.draw();
-		}
-
-			
-		renderPipe();
-		
-		Shader.BG.disable();
-		bgTexture.unbind();
-		bird.render();
-
-		
-		
-	}
-	public void initBirdPosition()
-	{
-		bird.setPosition(new Vector3f(0f, 0f, 0f));
-	}
-	public void renderStartScreen(boolean addBird)
+	/************************************/	
+	
+	public void renderStartScreen(boolean updateBirdStartScreen)
 	{
 		bgTexture.bind();
 		Shader.BG.enable();
 		background.bind();
 		
 		
-		// 3 is used to put together three copies of images
-		// The Model matrix 
-		// http://www.opengl-tutorial.org/beginners-tutorials/tutorial-3-matrices/
-		// View matrix is not the right terminology
-		// Coordination rule :  
+		// 3 background images are big enough to cover the whole window 
+ 
 		for(int i = 0; i < 2; i++ )
 		{
 			Shader.BG.setUniform4fv("vw_matrix", Matrix4f.translate(new Vector3f(i * 10, 0.0f, 0.0f)));
@@ -291,11 +370,13 @@ public class Level {
 		}
 		Shader.BG.disable();
 		bgTexture.unbind();
-		
-		bird.renderBirdInit(addBird);
-		startText.getStatusTextItem().renderText();
+		background.unbind();
+		bird.renderBirdStartSceen(updateBirdStartScreen);
+		startText.getStatusTextItem().renderText(StateMachine.StartScreen);
 			
 	}
+	
+	
 	public void renderGameOver()
 	{
 		bgTexture.bind();
@@ -310,7 +391,7 @@ public class Level {
 		}
 		Shader.BG.disable();
 		bgTexture.unbind();
-		gameoverText.getStatusTextItem().renderText();
+		gameoverText.getStatusTextItem().renderText(StateMachine.GameOver);
 	
 	}
 }
