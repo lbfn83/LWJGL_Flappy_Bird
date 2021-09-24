@@ -76,12 +76,27 @@ public class Main implements Runnable {
 				break;
 			case Running:
 				stateRunning();
-				gameState = gameState.nextState(level.isGameOver(), aborted);
+				try {
+					gameState = gameState.nextState(level.isGameOver(), aborted);
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 				break;
 				
 			case GameOver:
-				stateGameOver();
-				gameState = gameState.nextState(level.isGameOver(), aborted);
+				try {
+					stateGameOver();
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				try {
+					gameState = gameState.nextState(level.isGameOver(), aborted);
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 				break;
 
 			default :
@@ -266,7 +281,7 @@ public class Main implements Runnable {
 			aborted = true;
 		}
 	}
-	private void stateGameOver() {
+	private void stateGameOver() throws Exception {
 		//  Reset the parameters for objects ( pipe, bird ) in Running State 
 //		if(gameState.getStateJustChanged())
 //		{

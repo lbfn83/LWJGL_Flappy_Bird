@@ -12,17 +12,10 @@ import com.wonzii.flappy.math.Vector3f;
 public class Level {
 
 	
-	public boolean isGameOver() {
-		return gameOver;
-	}
-
-	public void setGameOver(boolean gameOver) {
-		this.gameOver = gameOver;
-	}
 	private boolean[] birdIsInPipearea;
 	private float prevBx0, prevBx1;
 	private int score = 0;
-	private boolean gameOver;
+	
 	private VertexArray background;
 	private Texture bgTexture;
 	private int xScroll = 0;
@@ -42,9 +35,26 @@ public class Level {
 	private final float startOffset = 10.0f;
 	private final float pipeCreaRate = 3.0f;
 	private float pipeMovingDistance;
+	private boolean control = true;
+	private boolean postCollisionControl;
 	
 	
+	public boolean isGameOver() throws Exception {
+		if(bird instanceof Bird )
+			return bird.isGameOver();
+		throw new Exception("bird is not initialized yet");
+	}
 	
+	public void setGameOver(boolean gameOver) throws Exception {
+		if(bird instanceof Bird )
+		{
+			bird.setGameOver(gameOver);
+		}
+		else
+		{
+			throw new Exception("bird is not initialized yet");
+		}
+	}
 	
 	private float randomNumGen()
 	{
@@ -184,12 +194,6 @@ public class Level {
 			}
 		}
 
-		
-		//touch the ground
-		if(by0 < -10)
-		{
-			return true;
-		}
 		return false;
 	}
 	
@@ -203,8 +207,13 @@ public class Level {
 		repositionPipes();
 		resetxScroll();
 		resetmap();
+		resetpostCollisionControl();
 		initBirdPosition();
 	}
+	private void resetpostCollisionControl() {
+		postCollisionControl = false;
+	}
+
 	private void resetScore()
 	{
 		score = 0;
@@ -254,24 +263,34 @@ public class Level {
 	          
 	public void update()  {
 		//the degree of movement the meshes makes in the leftward of the screen
-
-		xScroll--;
+		if(!postCollisionControl)
+		{
+			xScroll--;
 //		System.out.println("xScroll : " + xScroll);
-		// 335 and xScroll * 0.03 => 
-		// the width of display is 10 so translation matrix vector starts with i*10
-		// every multiple of 335 will increase the count of map 
-		// it is because xScroll won't be reset but still counting down while game is running
-		//When map is increased, xscroll*0.03f should be -10 to offset i * 10
-		if (-xScroll%334 == 0)
-		{
-			map++;
+			// 335 and xScroll * 0.03 => 
+			// the width of display is 10 so translation matrix vector starts with i*10
+			// every multiple of 335 will increase the count of map 
+			// it is because xScroll won't be reset but still counting down while game is running
+			//When map is increased, xscroll*0.03f should be -10 to offset i * 10
+			if (-xScroll%334 == 0)
+			{
+				map++;
+			}
+			if( -xScroll > 400 && -xScroll % 120 == 0 )
+			{
+				updatePipes();
+			}
+			//This is for calculating tick 
 		}
-  		if( -xScroll > 400 && -xScroll % 120 == 0 )
+
+		bird.update(); 
+		
+		if(!postCollisionControl&&collision())
 		{
-			updatePipes();
+			bird.postCollision();
+			postCollisionControl = true;
 		}
-		//This is for calculating tick 
-		bird.update();
+			
 	}
 	
 
@@ -294,7 +313,7 @@ public class Level {
 	public void render(StateMachine gameState) {
 
 		
-		setGameOver(collision());
+//		setGameOver(collision());
 		scoreCount(gameState);
 		
 		bgTexture.bind();

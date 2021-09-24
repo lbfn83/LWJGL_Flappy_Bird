@@ -21,6 +21,7 @@ public class Bird {
 	private VertexArray mesh;
 	private Texture texture;
 	private final float size = 1.0f;
+	private boolean gameOver;
 	
 	private Vector3f position = new Vector3f();
 	private float rot;
@@ -58,6 +59,14 @@ public class Bird {
 		
 	}
 	
+	public boolean isGameOver() {
+		return gameOver;
+	}
+
+	public void setGameOver(boolean gameOver) {
+		this.gameOver = gameOver;
+	}
+
 	public void update() {
 //		System.out.println(Input.keys[GLFW.GLFW_KEY_UP]);
 //		if(Input.isKeyDown(GLFW_KEY_UP))
@@ -90,7 +99,11 @@ public class Bird {
 		// when delta is minus, bird's face up
 		// when delta is plus, bird's face down
 		rot = -delta * 90.0f;
-
+		
+		/*GameOVER flag*/
+		if( (position.y - size/2) < -10) {
+			gameOver = true;
+		}
 	}
 
 	public void render() {
@@ -166,5 +179,9 @@ public class Bird {
 	public float getSize() {
 		// TODO Auto-generated method stub
 		return size;
+	}
+
+	public void postCollision() {
+			delta = -0.15f;
 	}
 }
