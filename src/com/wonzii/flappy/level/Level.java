@@ -30,13 +30,16 @@ public class Level {
 	/*random number*/
 	private Random r;
 	/* the range of y coordination of the upper pipe*/
-	private final float randomMax = 6f;
-	private final float randomMin = -0.0f;
+	private final float randomMax = 5.5f;
+	private final float randomMin = 0.0f;
 	private final float startOffset = 10.0f;
 	private final float pipeCreaRate = 3.0f;
 	private float pipeMovingDistance;
-	private boolean control = true;
 	private boolean postCollisionControl;
+	private float pipeVelocity = 0.05f;
+	private int prevScore;
+	private boolean updatePipeFlag;
+	private double pipeTargetVelocity;
 	
 	
 	public boolean isGameOver() throws Exception {
@@ -62,11 +65,16 @@ public class Level {
 	}
 	
 	public Level() {
+		//First Texture for Background will cover only the half of screen (-10f / refer to orthographic)
 		float[] vertices = new float[] {
-			-10.0f, -10.0f * 9f / 16f, 0.0f,
-			-10.0f, 10.0f * 9f / 16f, 0.0f,
-			0.0f, 10.0f * 9f / 16f, 0.0f,
-			0.0f, -10.0f * 9f / 16f, 0.0f
+				-10f, -4f, 0.0f,
+				-10f, 4f, 0.0f,
+				0.0f,4f, 0.0f,
+				0.0f, -4f, 0.0f
+//			-10f, -10.0f * 9f / 16f, 0.0f,
+//			-10f, 10.0f * 9f / 16f, 0.0f,
+//			0.0f, 10.0f * 9f / 16f, 0.0f,
+//			0.0f, -10.0f * 9f / 16f, 0.0f
 		};
 		
 		byte[] indices = new byte[] {
@@ -117,7 +125,7 @@ public class Level {
 			// 4 is a gap between up and down / 8 is the length of pipe
 			pipes[i+1] = new Pipe(pipes[i].getPosition().x, yCoord - 5 - 8);
 			
-			
+			System.out.println("pipe's "+i +"th x coord is " +pipes[i].getPosition().x);
 			index = index + 2;
 		}
 		
@@ -144,18 +152,21 @@ public class Level {
 					try {
 						scoreText2 = new Hud(String.valueOf(score));
 					} catch (Exception e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
 				}else if(!(px0 < bx1 && px1 > bx0))
 				{
 					birdIsInPipearea[i] = false;
 				}
+ 				if ((prevScore != score) && (score%2 == 0) )
+ 				{
+ 					pipeTargetVelocity = pipeVelocity*1.2;
+ 				}
 					
 			}
 			
 		}
-		
+		prevScore = score;
 		prevBx0 = bx0;
 		prevBx1 = bx1;
 		
@@ -209,6 +220,12 @@ public class Level {
 		resetmap();
 		resetpostCollisionControl();
 		initBirdPosition();
+		resetPipeMovingParameters();
+	}
+	private void resetPipeMovingParameters()
+	{
+		pipeTargetVelocity = 0.0f;
+		pipeVelocity = 0.05f;
 	}
 	private void resetpostCollisionControl() {
 		postCollisionControl = false;
@@ -262,25 +279,26 @@ public class Level {
 	
 	          
 	public void update()  {
-		//the degree of movement the meshes makes in the leftward of the screen
 		if(!postCollisionControl)
 		{
+			// count up time
 			xScroll--;
-//		System.out.println("xScroll : " + xScroll);
-			// 335 and xScroll * 0.03 => 
+			// 334 here and 0.03 in render() =>
 			// the width of display is 10 so translation matrix vector starts with i*10
-			// every multiple of 335 will increase the count of map 
+			
 			// it is because xScroll won't be reset but still counting down while game is running
 			//When map is increased, xscroll*0.03f should be -10 to offset i * 10
 			if (-xScroll%334 == 0)
 			{
 				map++;
-			}
-			if( -xScroll > 400 && -xScroll % 120 == 0 )
+			} 
+			
+			/*When any one of pipes( must be leftmost pipe ) is reached outside of screen, then updatePipe should be called*/
+			if(updatePipeFlag)
 			{
 				updatePipes();
+				updatePipeFlag = false;
 			}
-			//This is for calculating tick 
 		}
 
 		bird.update(); 
@@ -290,18 +308,17 @@ public class Level {
 			bird.postCollision();
 			postCollisionControl = true;
 		}
-			
 	}
 	
 
-	// Recycle the pipes 
+	// Updatepipes => Recycle the pipes 
 	private void updatePipes() 
 	{
-		float yCoord = randomNumGen();
+   		float yCoord = randomNumGen();
 		pipes[index % 10] = new Pipe(startOffset + (index)*pipeCreaRate, yCoord);
 		pipes[(index % 10) + 1] = new Pipe(pipes[index % 10].getPosition().x,  yCoord - 5 - 8);
-		//	System.out.println( "Pips's moving weight of x coodrination: " + xScroll*0.05f);
-		//	System.out.println( "Pipe's " +index +"th initial  x coodrination: " + pipes[index%10].getPosition().x);
+//		System.out.println( "Game's moving tick is : " + xScroll);
+//		System.out.println( "Pipe's " +index +"th initial  x coodrination: " + pipes[index%10].getPosition().x);
 		index = index +2;
 	}
 	
@@ -321,15 +338,16 @@ public class Level {
 		background.bind();
 		
 		
-		// 3 is used to put together three copies of images
-		// The Model matrix 
-		// http://www.opengl-tutorial.org/beginners-tutorials/tutorial-3-matrices/
-		// View matrix is not the right terminology
-		// Coordination rule :  
+		// 4 is used to put together four copies of images
+		// map will be counted up to +1 when xScroll( minus value ) reached 10   
 		for(int i = map; i < map + 4 ; i++ )
 		{
 			Shader.BG.setUniform4fv("vw_matrix", Matrix4f.translate(new Vector3f(i * 10 + xScroll*0.03f, 0.0f, 0.0f)));
 			background.draw();
+			if(i==map)
+			{
+				System.out.println();
+			}
 		}
 
 			
@@ -346,13 +364,33 @@ public class Level {
 	}
 	
 	private void renderPipe() {
+		/*pipeVel should be incremented slowly for smooth rendering*/
+		if(pipeTargetVelocity > pipeVelocity && !postCollisionControl)
+		{
+			pipeVelocity +=0.000001f;
+		}
+		// xScroll is time ( tick )
+		pipeMovingDistance = xScroll*pipeVelocity;
 		
-		pipeMovingDistance = xScroll*0.05f;
 		Shader.PIPE.enable();
 		Shader.PIPE.setUniform2f("bird", 0, bird.getY());
 		
 		Shader.PIPE.setUniform4fv("vw_matrix", Matrix4f.translate(new Vector3f( pipeMovingDistance, 0.0f, 0.0f)));
 		
+		/*Check each pipe's x coordination to determine the timing of update on pipe object*/
+		Matrix4f[] pipeXCoordCheck = new Matrix4f[5]; 
+				
+		for(int k=0; k<5;k++)
+		{
+			pipeXCoordCheck[k] = Matrix4f.translate(new Vector3f( pipeMovingDistance, 0.0f, 0.0f)).multiply(pipes[k*2].getMl_Matrix());
+			
+			/*When any one of pipes( must be leftmost pipe ) is reached outside of screen, then updatePipe should be called*/
+			if(pipeXCoordCheck[k].elements[12] < -10f - Pipe.getWidth())
+			{
+				updatePipeFlag = true;
+				break;
+			}
+		}
 		Pipe.getTexture().bind();
 		Pipe.getMesh().bind();
 		
