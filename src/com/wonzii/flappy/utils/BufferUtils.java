@@ -5,7 +5,6 @@ import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.List;
-// Helper class : not instaiated
 public class BufferUtils {
 	private BufferUtils() {
 		

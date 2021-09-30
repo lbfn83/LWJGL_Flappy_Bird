@@ -16,8 +16,7 @@ public class Matrix4f {
 	{
 		
 	}
-	//identity matrix 단위행렬
-	// static : because it returns new matrix like constructor
+	//identity matrix 
 	public static Matrix4f identity()
 	{
 		Matrix4f result = new Matrix4f();

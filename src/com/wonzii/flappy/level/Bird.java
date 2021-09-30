@@ -3,10 +3,9 @@ package com.wonzii.flappy.level;
 import static org.lwjgl.glfw.GLFW.*;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Random;
 
+import com.wonzii.flappy.Direction;
 import com.wonzii.flappy.graphics.Shader;
 import com.wonzii.flappy.graphics.Texture;
 import com.wonzii.flappy.graphics.VertexArray;
@@ -30,6 +29,7 @@ public class Bird {
 	private Random r;
 	private final float randomMax = 5.0f;
 	private final float randomMin = -5.0f;
+
 	
 	public Bird() {
 		
@@ -67,25 +67,46 @@ public class Bird {
 		this.gameOver = gameOver;
 	}
 
-	public void update() {
-//		System.out.println(Input.keys[GLFW.GLFW_KEY_UP]);
-//		if(Input.isKeyDown(GLFW_KEY_UP))
-//		{
-//			position.y += 0.1f;
-//		}
-//		if(Input.isKeyDown(GLFW_KEY_DOWN))
-//		{
-//			position.y -= 0.1f;
-//		}
-//		if(Input.isKeyDown(GLFW_KEY_LEFT))
-//		{
-//			position.x -= 0.1f;    
-//		}
-//		if(Input.isKeyDown(GLFW_KEY_RIGHT))
-//		{
-//			position.x += 0.1f;			;
-//		}
-//		System.out.println("delta : " + delta);
+	public void update(Direction collisionDir, float pipeVelocity) {
+		/* debug code
+		System.out.println(Input.keys[GLFW.GLFW_KEY_UP]);
+		if(Input.isKeyDown(GLFW_KEY_UP))
+		{
+			position.y += 0.1f;
+		}
+		if(Input.isKeyDown(GLFW_KEY_DOWN))
+		{
+			position.y -= 0.1f;
+		}
+		if(Input.isKeyDown(GLFW_KEY_LEFT))
+		{
+			position.x -= 0.1f;    
+		}
+		if(Input.isKeyDown(GLFW_KEY_RIGHT))
+		{
+			position.x += 0.1f;			;
+		}
+		*/
+		switch (collisionDir) {
+		case Right:
+			position.x -=  pipeVelocity;
+			break;
+		case Left:
+			position.x +=  pipeVelocity;
+		break;
+		case Bottom:
+			position.x +=  pipeVelocity;
+		break;
+		case Top:
+			if(delta < 0f)
+				delta = 0.1f;
+			delta += 0.01f;
+			position.x +=  pipeVelocity/2f;
+		break;
+		default:
+			break;
+		}
+		
 		
 		position.y -= delta;
 		
@@ -100,16 +121,18 @@ public class Bird {
 		// when delta is plus, bird's face down
 		rot = -delta * 90.0f;
 		
+		
 		/*GameOVER flag*/
 		if( (position.y - size/2) < -10) {
 			gameOver = true;
 		}
+		
+
 	}
 
 	public void render() {
 
 		Shader.BIRD.enable();
-//		System.out.println("bird's position : "+ position.x );
 		Shader.BIRD.setUniform4fv("vw_matrix", Matrix4f.translate(position).multiply(Matrix4f.rotate(rot)));
 		texture.bind();
 		mesh.render();
@@ -181,7 +204,8 @@ public class Bird {
 		return size;
 	}
 
-	public void postCollision() {
+	public void bottomCollisionOnce() {
 			delta = -0.15f;
 	}
+
 }
