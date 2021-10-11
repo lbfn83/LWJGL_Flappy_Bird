@@ -126,7 +126,7 @@ public class Level {
 			// 4 is a gap between up and down / 8 is the length of pipe
 			pipes[i+1] = new Pipe(pipes[i].getPosition().x, yCoord - 5 - 8);
 			
-			System.out.println("pipe's "+i +"th x coord is " +pipes[i].getPosition().x);
+//			System.out.println("pipe's "+i +"th x coord is " +pipes[i].getPosition().x);
 			index = index + 2;
 		}
 		
@@ -364,7 +364,7 @@ public class Level {
 			/*When any one of pipes( must be leftmost pipe ) is reached outside of screen, then updatePipe should be called*/
 			if(updatePipeFlag)
 			{
-				System.out.println("pipe updated");
+//				System.out.println("pipe updated");
 				updatePipes();
 				updatePipeFlag = false;
 			}
@@ -446,7 +446,7 @@ public class Level {
 				updatePipeFlag = true;
 				break;
 			}
-			System.out.println("pipeXCoordCheck "+ k +" : " +pipeXCoordCheck[k].elements[12] );
+//			System.out.println("pipeXCoordCheck "+ k +" : " +pipeXCoordCheck[k].elements[12] );
 		}
 		Pipe.getTexture().bind();
 		Pipe.getMesh().bind();
