@@ -3,7 +3,7 @@
 This is a tweaked version of Flappy Bird to introduce more features for interesting gaming experience.
 It is made for desktop platforms, which was originally created for a video tutorial on YouTube where Cherno demonstrates how to make this game from scratch, in about 3 hours including short explanations of what is being typed, and why. 
 
-<br /><br />
+<br />
   You can find the Youtube video [here](http://youtu.be/527bR2JHSR0). <br /> 
 
 ## Added Features
