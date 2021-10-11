@@ -10,5 +10,7 @@ It is made for desktop platforms, which was originally created for a video tutor
  : "Start Screen", "Running" and "Game over" 
 * Collision detection / resolution
 * The speed of pipe movement increases gradually 
+![Image of Flappy Bird1](screenshot/collision.gif)
+![Image of Flappy Bird1](screenshot/game state_hud.gif)
 ## Dependencies
 * `LWJGL 3` : Light Weight Java Game Library 3, which you can download [here](http://www.lwjgl.org/download). You'll have to manually add the JAR and native files to your classpath in order to build and run the game.
