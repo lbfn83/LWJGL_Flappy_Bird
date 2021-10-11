@@ -18,6 +18,5 @@ It is made for desktop platforms, which was originally created for a video tutor
   <em>Collision</em>
  <br />
  
-#### Collision Detection / Resolution
 ## Dependencies
 * `LWJGL 3` : Light Weight Java Game Library 3, which you can download [here](http://www.lwjgl.org/download). You'll have to manually add the JAR and native files to your classpath in order to build and run the game.
