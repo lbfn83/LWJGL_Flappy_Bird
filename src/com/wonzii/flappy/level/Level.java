@@ -228,22 +228,12 @@ public class Level {
 		aabb2_halfExtent = null;
 		diffCenters  = null;
 		
-		Direction a = vectorDirection(new Vector2f(closestX - birdX, closestY - birdY) );
+		Direction direction = vectorDirection(new Vector2f(closestX - birdX, closestY - birdY) );
 		
-		System.out.println(a);
-		switch (a) {
-		case Right:
-			
-			break;
-		case Bottom:
-			
-			break;
-			
-			
-		default:
-			break;
-		}
-		return a;
+		System.out.println(direction);
+
+
+		return direction;
 	}
 	private Direction vectorDirection(Vector2f distVect)
 	{
@@ -279,18 +269,20 @@ public class Level {
 	//Get the game screen ready for new game play
 	public void initForRunningState()
 	{
+		resetpostCollisionControl();
 		resetScore();
 		repositionPipes();
 		resetxScroll();
 		resetmap();
-		resetpostCollisionControl();
 		initBirdPosition();
 		resetPipeMovingParameters();
 	}
+	
 	private void resetPipeMovingParameters()
 	{
 		pipeTargetVelocity = 0.0f;
 		pipeVelocity = 0.05f;
+		pipeMovingDistance = 0f;
 	}
 	private void resetpostCollisionControl() {
 		collisionDir = Direction.None;
@@ -314,7 +306,7 @@ public class Level {
 		// reset required; Pipe's positioning is based on index
 		index = 0;
 		r = new Random();
-		
+		updatePipeFlag = false;
 		//coordination of each pipe element
 		for( int i=0; i<2*5; i+=2)
 		{
@@ -324,7 +316,6 @@ public class Level {
 			pipes[i] = new Pipe(startOffset +(float)i*pipeCreaRate*weight, yCoord);
 			// 4 is a gap between up and down / 8 is the length of pipe
 			pipes[i+1] = new Pipe(pipes[i].getPosition().x, yCoord - 5 - 8);
-			
 			
 			index = index + 2;
 		}
@@ -373,6 +364,7 @@ public class Level {
 			/*When any one of pipes( must be leftmost pipe ) is reached outside of screen, then updatePipe should be called*/
 			if(updatePipeFlag)
 			{
+				System.out.println("pipe updated");
 				updatePipes();
 				updatePipeFlag = false;
 			}
@@ -436,14 +428,10 @@ public class Level {
 			pipeVelocity +=0.00001f;
 		}
 		pipeMovingDistance = xScroll*pipeVelocity;
-		
-//		System.out.println("pipeVelocity :" + pipeVelocity + "/ pipeTargetVelocity" + pipeTargetVelocity );
-		
 		Shader.PIPE.enable();
 		Shader.PIPE.setUniform2f("bird", 0, bird.getY());
 		
 		Shader.PIPE.setUniform4fv("vw_matrix", Matrix4f.translate(new Vector3f( pipeMovingDistance, 0.0f, 0.0f)));
-		
 		/*Check each pipe's x coordination to determine the timing of update on pipe object*/
 		Matrix4f[] pipeXCoordCheck = new Matrix4f[5]; 
 				
@@ -458,6 +446,7 @@ public class Level {
 				updatePipeFlag = true;
 				break;
 			}
+			System.out.println("pipeXCoordCheck "+ k +" : " +pipeXCoordCheck[k].elements[12] );
 		}
 		Pipe.getTexture().bind();
 		Pipe.getMesh().bind();

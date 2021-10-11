@@ -246,6 +246,7 @@ public class Main implements Runnable {
 	{
 		if(gameState.getStateJustChanged())
 		{	
+			System.out.println("game start!");
 			level.initForRunningState();
 			timer = System.currentTimeMillis();
 			lastTime = System.nanoTime();
