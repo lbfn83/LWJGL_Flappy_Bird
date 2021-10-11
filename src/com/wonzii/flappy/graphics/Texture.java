@@ -32,9 +32,7 @@ public class Texture {
 	public Texture(String path)
 	{
 			texture = load(path);
-
 	}
-	
 	
 	private int load(String path) {
 		int[] pixels = null;

@@ -26,6 +26,10 @@ public class Bird {
 	private float rot;
 	private float delta = 0.0f;
 	
+	public void setDelta(float delta) {
+		this.delta = delta;
+	}
+
 	private Random r;
 	private final float randomMax = 5.0f;
 	private final float randomMin = -5.0f;
@@ -110,7 +114,7 @@ public class Bird {
 		
 		position.y -= delta;
 		
-		if( Input.isKeyDown(GLFW_KEY_SPACE))
+		if( Input.isKeyDown(GLFW_KEY_SPACE) && collisionDir == Direction.None)
 		{
 			delta =	-0.15f ;
 		}else
@@ -127,7 +131,6 @@ public class Bird {
 			gameOver = true;
 		}
 		
-
 	}
 
 	public void render() {

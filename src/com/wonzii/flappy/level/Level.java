@@ -161,7 +161,7 @@ public class Level {
 				}
  				if ((prevScore != score) && (score%2 == 0) )
  				{
- 					pipeTargetVelocity = pipeVelocity*1.2;
+ 					pipeTargetVelocity = pipeVelocity*1.05;
  				}
 					
 			}
@@ -337,6 +337,7 @@ public class Level {
 	}
 	private void initBirdPosition()
 	{
+		bird.setDelta(0f);
 		bird.setPosition(new Vector3f(0f, 0f, 0f));
 	}
 	
@@ -432,9 +433,11 @@ public class Level {
 		/*Incremental speed up / pipeVel should be incremented slowly for smooth rendering. */
 		if(pipeTargetVelocity > pipeVelocity && (collisionDir == Direction.None))
 		{
-			pipeVelocity +=0.000001f;
+			pipeVelocity +=0.00001f;
 		}
 		pipeMovingDistance = xScroll*pipeVelocity;
+		
+//		System.out.println("pipeVelocity :" + pipeVelocity + "/ pipeTargetVelocity" + pipeTargetVelocity );
 		
 		Shader.PIPE.enable();
 		Shader.PIPE.setUniform2f("bird", 0, bird.getY());
